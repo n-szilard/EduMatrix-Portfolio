@@ -1,0 +1,167 @@
+$bg-card: #1e1e2e;
+$bg-input: #12121f;
+$blue: #3b82f6;
+$blue-dark: #2563eb;
+$border: rgba(255, 255, 255, 0.12);
+$text: #e2e8f0;
+$text-muted: #94a3b8;
+$text-dim: #64748b;
+$text-placeholder: #475569;
+$text-faint: #334155;
+
+@mixin input-base {
+  width: 100%;
+  background: $bg-input;
+  border: 1px solid $border;
+  color: $text;
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+
+  &::placeholder { color: $text-placeholder; }
+  &:focus {
+    border-color: $blue;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    outline: none;
+  }
+}
+
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 60px);
+  padding: 1rem;
+
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+
+    ::ng-deep .p-card-body { padding: 2rem; }
+
+    .header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+
+      .logo-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 52px;
+        height: 52px;
+        background: rgba(59, 130, 246, 0.15);
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        i { font-size: 1.6rem; color: $blue; }
+      }
+
+      h2 { color: #fff; font-size: 1.4rem; font-weight: 700; margin: 0 0 0.4rem; }
+      p  { color: $text-muted; font-size: 0.85rem; margin: 0; }
+    }
+
+    .field {
+      margin-bottom: 1rem;
+
+      label { display: block; color: #cbd5e1; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; }
+
+      input.full-width { @include input-base; }
+
+      ::ng-deep .p-password {
+        width: 100%;
+        display: block;
+
+        &.p-inputwrapper {
+          border: none !important;
+          box-shadow: none !important;
+          background: transparent !important;
+          padding: 0 !important;
+          border-radius: 0 !important;
+        }
+
+        input.p-inputtext { @include input-base; }
+        .p-password-toggle-icon { color: $text-placeholder; right: 0.75rem; }
+      }
+
+      ::ng-deep .p-password-panel { display: none !important; }
+    }
+
+    .options {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.2rem;
+
+      label { color: $text-muted; font-size: 0.82rem; cursor: pointer; flex: 1; }
+
+      .forgot {
+        color: $blue;
+        font-size: 0.82rem;
+        text-decoration: none;
+        white-space: nowrap;
+        &:hover { text-decoration: underline; }
+      }
+
+      ::ng-deep .p-checkbox .p-checkbox-box {
+        background: $bg-input;
+        border-color: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        width: 16px;
+        height: 16px;
+        &.p-highlight { background: $blue; border-color: $blue; }
+      }
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: $blue;
+      border: none;
+      border-radius: 6px;
+      padding: 0.65rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: background 0.2s;
+      &:hover { background: $blue-dark; }
+    }
+
+    .support-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: 1.2rem;
+      font-size: 0.78rem;
+      color: $text-dim;
+
+      .support-link {
+        color: $blue;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-weight: 500;
+        i { font-size: 0.75rem; }
+        &:hover { text-decoration: underline; }
+      }
+    }
+
+    .system-label {
+      text-align: center;
+      margin-top: 0.8rem;
+      font-size: 0.62rem;
+      letter-spacing: 0.12em;
+      color: $text-faint;
+      text-transform: uppercase;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+
+      .version { color: $text-placeholder; font-size: 0.65rem; letter-spacing: 0.05em; text-transform: none; }
+    }
+
+    .footer { text-align: center; margin-top: 1rem; font-size: 0.75rem; color: $text-faint; }
+  }
+}

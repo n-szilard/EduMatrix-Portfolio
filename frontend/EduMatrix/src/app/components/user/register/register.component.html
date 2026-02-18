@@ -1,1 +1,71 @@
-<p>register works!</p>
+<div class="register-wrapper">
+  <p-card class="register-card">
+    <div class="header">
+      <div class="logo-icon"><i class="pi pi-graduation-cap"></i></div>
+      <h2>Fiók létrehozása</h2>
+      <p>Regisztráljon az iskolai rendszer használatához</p>
+    </div>
+
+    <form [formGroup]="registerForm" (ngSubmit)="register()">
+      <div class="field-row">
+        <div class="field">
+          <label>Keresztnév</label>
+          <input pInputText formControlName="firstName" placeholder="János" class="full-width" />
+        </div>
+        <div class="field">
+          <label>Vezetéknév</label>
+          <input pInputText formControlName="lastName" placeholder="Kovács" class="full-width" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email cím</label>
+        <input pInputText formControlName="email" type="email" placeholder="felhasznalonev@iskola.hu" class="full-width" />
+      </div>
+
+      <div class="field">
+        <label>Felhasználónév</label>
+        <input pInputText formControlName="username" placeholder="felhasznalonev" class="full-width" />
+      </div>
+
+      <div class="field">
+        <label>Jelszó</label>
+        <p-password formControlName="password" [feedback]="true" [toggleMask]="true" styleClass="full-width" placeholder="••••••••" weakLabel="Gyenge" mediumLabel="Közepes" strongLabel="Erős"></p-password>
+      </div>
+
+      <div class="field">
+        <label>Jelszó megerősítése</label>
+        <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" styleClass="full-width" placeholder="••••••••"></p-password>
+        <small class="error-msg" *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched">
+          A jelszavak nem egyeznek.
+        </small>
+      </div>
+
+      <div class="field">
+        <label>Szerepkör</label>
+        <p-dropdown formControlName="role" [options]="roles" placeholder="Válasszon szerepkört" styleClass="full-width" optionLabel="label" optionValue="value"></p-dropdown>
+      </div>
+
+      <div class="terms-row">
+        <p-checkbox formControlName="acceptTerms" binary="true" inputId="terms"></p-checkbox>
+        <label for="terms">Elfogadom az <a href="#" class="link">általános szerződési feltételeket</a></label>
+      </div>
+
+      <button pButton type="submit" label="Regisztráció" icon="pi pi-user-plus" iconPos="right" class="full-width submit-btn" [disabled]="registerForm.invalid"></button>
+
+      <div class="login-redirect">
+        Már van fiókja? <a routerLink="/login" class="link">Bejelentkezés</a>
+      </div>
+    </form>
+
+    <div class="support-row">
+      <span>Segítségre van szüksége?</span>
+      <a href="#" class="support-link"><i class="pi pi-file"></i> Technikai segítség</a>
+    </div>
+    <div class="system-label">
+      EDUMATRIX ISKOLAI ADMINISZTRÁCIÓ
+      <span class="version">EduMatrix Admin v4.2</span>
+    </div>
+    <div class="footer">© 2024 EduMatrix Inc. Minden jog fenntartva.</div>
+  </p-card>
+</div>
