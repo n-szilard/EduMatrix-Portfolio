@@ -1,1 +1,9 @@
 /* You can add global styles to this file, and also import other style files */
+@import "../node_modules/primeflex/primeflex.min.css";
+@import "../node_modules/primeicons/primeicons.css";
+
+body {
+    font-family: "Lexend", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+}
