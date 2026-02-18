@@ -1,1 +1,31 @@
-<p>home works!</p>
+<div class="overflow-hidden">
+    <div id="backdrop" class="flex flex-column align-items-center text-center bg-cover bg-center bg-no-repeat w-full h-30rem">
+        <h1 class="text-7xl mb-3">A jövő iskolai <br><span class="text-primary-500">adminisztrációja</span></h1>
+        <p class="w-8 text-color-secondary mb-6">Hatékony, modern és átlátható rendszer oktatási intézmények számára. Az EduMatrix segítségével az adminisztráció teherből lehetőséggé válik.</p>
+        <div class="flex w-5 justify-content-between">
+            <p-button label="Kezdje el most" size="large"/>
+            <p-button label="Demó megtekintése" severity="secondary" [outlined]="true" size="large"/>
+        </div>
+    </div>
+    <div id="cards" class="text-center">
+        <h1>Értékajánlatunk mindenkinek</h1>
+        <p class="text-color-secondary mb-6">Személyre szabott megoldások az iskola minden résztvevőjének számára.</p>
+        <div id="cardContainer" class="flex text-left gap-3 px-4">
+            <p-card header="Diákoknak" class="border-1 border-round-xl border-200">
+                <p class="text-color-secondary">
+                    Naprakész jegyek, órarend és házífeladatok elérhetők bárhol, bármikor. Értesítések a változásokról azonnal.
+                </p>
+            </p-card>
+            <p-card header="Tanároknak" class="border-1 border-round-xl border-200">
+                <p class="text-color-secondary">
+                    Gyors és egyszerű naplózás, automatikus statisztikák és hatékony kapcsolattartás a szülőkkel és diákokkal.
+                </p>
+            </p-card>
+            <p-card header="Adminisztrátoroknak" class="border-1 border-round-xl border-200">
+                <p class="text-color-secondary">
+                    Teljes kontroll az iskola minden folyamata felett. Intelligens jelentések, erőforrás-kezelés és adatbiztonság.
+                </p>
+            </p-card>
+        </div>
+    </div>
+</div>
