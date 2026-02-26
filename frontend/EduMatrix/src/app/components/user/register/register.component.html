@@ -7,6 +7,11 @@
     </div>
 
     <form [formGroup]="registerForm" (ngSubmit)="register()">
+
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="full-width mb-3"></p-message>
+      <p-message *ngIf="successMessage" severity="success" [text]="successMessage"
+        styleClass="full-width mb-3"></p-message>
+
       <div class="field-row">
         <div class="field">
           <label>Keresztnév</label>
@@ -20,30 +25,46 @@
 
       <div class="field">
         <label>Email cím</label>
-        <input pInputText formControlName="email" type="email" placeholder="felhasznalonev@iskola.hu" class="full-width" />
+        <input pInputText formControlName="email" type="email" placeholder="felhasznalonev@iskola.hu"
+          class="full-width" />
+        <small class="error-msg" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+          Érvényes email cím megadása kötelező.
+        </small>
       </div>
 
       <div class="field">
         <label>Felhasználónév</label>
         <input pInputText formControlName="username" placeholder="felhasznalonev" class="full-width" />
+        <small class="error-msg" *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched">
+          Minimum 3 karakter szükséges.
+        </small>
       </div>
 
       <div class="field">
         <label>Jelszó</label>
-        <p-password formControlName="password" [feedback]="true" [toggleMask]="true" styleClass="full-width" placeholder="••••••••" weakLabel="Gyenge" mediumLabel="Közepes" strongLabel="Erős"></p-password>
+        <p-password formControlName="password" [feedback]="false" [toggleMask]="true" styleClass="full-width"
+          placeholder="••••••••">
+        </p-password>
+        <small class="error-msg" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+          Minimum 8 karakter szükséges.
+        </small>
       </div>
 
       <div class="field">
         <label>Jelszó megerősítése</label>
-        <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" styleClass="full-width" placeholder="••••••••"></p-password>
-        <small class="error-msg" *ngIf="registerForm.errors?.['passwordMismatch'] && registerForm.get('confirmPassword')?.touched">
+        <p-password formControlName="confirmPassword" [feedback]="false" [toggleMask]="true" styleClass="full-width"
+          placeholder="••••••••">
+        </p-password>
+        <small class="error-msg" *ngIf="passwordMismatch">
           A jelszavak nem egyeznek.
         </small>
       </div>
 
       <div class="field">
         <label>Szerepkör</label>
-        <p-dropdown formControlName="role" [options]="roles" placeholder="Válasszon szerepkört" styleClass="full-width" optionLabel="label" optionValue="value"></p-dropdown>
+        <p-select formControlName="role" [options]="roles" placeholder="Válasszon szerepkört" styleClass="full-width"
+          optionLabel="label" optionValue="value">
+        </p-select>
       </div>
 
       <div class="terms-row">
@@ -51,7 +72,9 @@
         <label for="terms">Elfogadom az <a href="#" class="link">általános szerződési feltételeket</a></label>
       </div>
 
-      <button pButton type="submit" label="Regisztráció" icon="pi pi-user-plus" iconPos="right" class="full-width submit-btn" [disabled]="registerForm.invalid"></button>
+      <button pButton type="submit" label="Regisztráció" icon="pi pi-user-plus" iconPos="right"
+        class="full-width submit-btn" [loading]="loading">
+      </button>
 
       <div class="login-redirect">
         Már van fiókja? <a routerLink="/login" class="link">Bejelentkezés</a>

@@ -7,14 +7,17 @@
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="login()">
+
+
       <div class="field">
         <label>Felhasználónév</label>
-        <input pInputText formControlName="username" placeholder="felhasznalonev@iskola.hu" class="full-width" />
+        <input pInputText formControlName="username" placeholder="felhasznalonev" class="full-width" />
       </div>
 
       <div class="field">
         <label>Jelszó</label>
-        <p-password formControlName="password" [feedback]="false" [toggleMask]="true" styleClass="full-width" placeholder="••••••••"></p-password>
+        <p-password formControlName="password" [feedback]="false" [toggleMask]="true" styleClass="full-width"
+          placeholder="••••••••"></p-password>
       </div>
 
       <div class="options">
@@ -23,7 +26,8 @@
         <a href="#" class="forgot">Elfelejtett jelszó</a>
       </div>
 
-      <button pButton type="submit" label="Bejelentkezés" icon="pi pi-arrow-right" iconPos="right" class="full-width submit-btn"></button>
+      <button pButton type="submit" label="Bejelentkezés" icon="pi pi-arrow-right" iconPos="right"
+        class="full-width submit-btn" [loading]="loading"></button>
     </form>
 
     <div class="support-row">
@@ -34,6 +38,5 @@
       EDUMATRIX ISKOLAI ADMINISZTRÁCIÓ
       <span class="version">EduMatrix Admin v4.2</span>
     </div>
-    <div class="footer">© 2024 EduMatrix Inc. Minden jog fenntartva.</div>
   </p-card>
 </div>
