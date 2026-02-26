@@ -1,7 +1,13 @@
 const app = require('./config/app');
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
 const { sequelize } = require('./models/index')
 
 const port = process.env.PORT;
+
+app.use(cors());
+app.use(express.json());
 
 (async () => {
     try {
@@ -19,3 +25,20 @@ const port = process.env.PORT;
 
 })();
 
+// Routes
+app.use('/api/users', require('./routes/users.routes'));
+
+// DB sync + szerver indítás
+const PORT = process.env.PORT || 3000;
+
+sequelize.authenticate()
+    .then(() => {
+        console.log('Adatbázis kapcsolat OK');
+        return sequelize.sync({ alter: false });
+    })
+    .then(() => {
+        app.listen(PORT, () => console.log(`Szerver fut: http://localhost:${PORT}`));
+    })
+    .catch(err => {
+        console.error('Indítási hiba:', err);
+    });
