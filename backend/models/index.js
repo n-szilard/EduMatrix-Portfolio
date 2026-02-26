@@ -38,4 +38,22 @@ Object.values(models).forEach((model) => {
     }
 });
 
+// Role betöltés
+const seedRoles = async () => {
+    const roles = ['admin', 'teacher', 'student', 'parent'];
+
+    for (const name of roles) {
+        await Role.findOrCreate({
+            where: { name },
+            defaults: { name },
+        });
+    }
+};
+
+sequelize.sync().then(() => {
+    seedRoles();
+}).catch((err) => {
+    console.error('Adatbázis szinkronizálása sikertelen:', err);
+});
+
 module.exports = { sequelize, ...models }
