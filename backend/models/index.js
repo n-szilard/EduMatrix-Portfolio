@@ -14,4 +14,17 @@ const sequelize = new Sequelize(
     }
 );
 
-module.exports = { sequelize }
+// Modellek betöltése
+const Role = require('./Role')(sequelize);
+const User = require('./User')(sequelize);
+
+const models = { Role, User };
+console.log(models);
+
+Object.values(models).forEach((model) => {
+    if (typeof model.associate === 'function') {
+        model.associate(models);
+    }
+});
+
+module.exports = { sequelize, ...models }
