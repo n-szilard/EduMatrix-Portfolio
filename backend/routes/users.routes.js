@@ -3,9 +3,44 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { User, Role } = require('../models');
+const { body, validationResult } = require('express-validator');
+
+// Validation rules
+const loginValidation = [
+  body('username').trim().notEmpty().withMessage('Felhasználónév megadása kötelező.'),
+  body('password').notEmpty().withMessage('Jelszó megadása kötelező.'),
+];
+
+const registerValidation = [
+  body('email')
+    .isEmail().withMessage('Érvénytelen email cím.')
+    .normalizeEmail(),
+  body('password')
+    .isLength({ min: 8 }).withMessage('A jelszónak legalább 8 karakter hosszúnak kell lennie.'),
+  body('username')
+    .trim()
+    .isAlphanumeric().withMessage('A felhasználónév csak betűket és számokat tartalmazhat.')
+    .isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
+  body('firstName')
+    .trim()
+    .escape()
+    .isLength({ min: 1, max: 50 }).withMessage('Keresztnév megadása kötelező (max. 50 karakter).'),
+  body('lastName')
+    .trim()
+    .escape()
+    .isLength({ min: 1, max: 50 }).withMessage('Vezetéknév megadása kötelező (max. 50 karakter).'),
+  body('role')
+    .trim()
+    .notEmpty().withMessage('Szerepkör megadása kötelező.'),
+];
 
 // POST /api/users/login
-router.post('/login', async (req, res) => {
+router.post('/login', loginValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const { username, password } = req.body;
 
@@ -39,13 +74,7 @@ router.post('/login', async (req, res) => {
     );
 
     res.json({
-      token,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        role: user.Role ? user.Role.name : null
-      }
+      token
     });
 
   } catch (error) {
@@ -55,7 +84,11 @@ router.post('/login', async (req, res) => {
 });
 
 // POST /api/users/register
-router.post('/register', async (req, res) => {
+router.post('/register', registerValidation, async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
   try {
     const { firstName, lastName, email, username, password, role } = req.body;
 
@@ -99,20 +132,14 @@ router.post('/register', async (req, res) => {
       { expiresIn: '8h' }
     );
 
-    res.status(201).json({
+    return res.status(201).json({
       message: 'Sikeres regisztráció!',
-      token,
-      user: {
-        id: newUser.id,
-        username: newUser.username,
-        email: newUser.email,
-        role: roleRecord.name
-      }
+      token
     });
 
   } catch (error) {
     console.error('Regisztráció hiba:', error.message);
-    res.status(500).json({ message: 'Szerverhiba: ' + error.message });
+    return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
   }
 });
 
