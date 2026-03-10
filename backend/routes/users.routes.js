@@ -29,9 +29,6 @@ const registerValidation = [
     .trim()
     .escape()
     .isLength({ min: 1, max: 50 }).withMessage('Vezetéknév megadása kötelező (max. 50 karakter).'),
-  body('role')
-    .trim()
-    .notEmpty().withMessage('Szerepkör megadása kötelező.'),
 ];
 
 // POST /api/users/login
@@ -84,15 +81,19 @@ router.post('/login', loginValidation, async (req, res) => {
 });
 
 // POST /api/users/register
+/**
+ * Felhasználó regisztrációja. A regisztráció után a fiók inaktív marad,
+ * amíg egy adminisztrátor szerepkört (role) nem rendel hozzá.
+ * A szerepkör határozza meg a rendszerhez való hozzáférési jogosultságokat.
+ */
 router.post('/register', registerValidation, async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
   try {
-    const { firstName, lastName, email, username, password, role } = req.body;
-
-    if (!firstName || !lastName || !email || !username || !password || !role) {
+    const { firstName, lastName, email, username, password } = req.body; // role kivéve
+    if (!firstName || !lastName || !email || !username || !password) {
       return res.status(400).json({ message: 'Minden mező kitöltése kötelező.' });
     }
 
@@ -100,41 +101,32 @@ router.post('/register', registerValidation, async (req, res) => {
     if (existingUsername) {
       return res.status(409).json({ message: 'Ez a felhasználónév már foglalt.' });
     }
-
     const existingEmail = await User.findOne({ where: { email } });
     if (existingEmail) {
       return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
     }
 
-    const roleRecord = await Role.findOne({ where: { name: role } });
-    if (!roleRecord) {
-      return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
+    // Automatikusan PENDING role hozzárendelése
+    const pendingRole = await Role.findOne({ where: { name: 'PENDING' } });
+    if (!pendingRole) {
+      return res.status(500).json({ message: 'Szerverhiba: PENDING szerepkör nem található.' });
     }
 
     const salt = await bcrypt.genSalt(10);
     const password_hash = await bcrypt.hash(password, salt);
 
-    const newUser = await User.create({
+    await User.create({
+      firstName,
+      lastName,
       username,
       email,
       password_hash,
-      role_id: roleRecord.id
+      role_id: pendingRole.id
     });
 
-    const token = jwt.sign(
-      {
-        id: newUser.id,
-        username: newUser.username,
-        email: newUser.email,
-        role: roleRecord.name
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '8h' }
-    );
-
+    // PENDING usereknek NEM adunk tokent, várniuk kell az admin jóváhagyására
     return res.status(201).json({
-      message: 'Sikeres regisztráció!',
-      token
+      message: 'Sikeres regisztráció! Fiókod aktiválásra vár, az adminisztrátor szerepkört rendel hozzád.'
     });
 
   } catch (error) {
