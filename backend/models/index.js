@@ -40,7 +40,7 @@ Object.values(models).forEach((model) => {
 
 // Role betöltés
 const seedRoles = async () => {
-    const roles = ['admin', 'teacher', 'student', 'parent'];
+    const roles = ['admin', 'teacher', 'student', 'parent', 'pending'];
 
     for (const name of roles) {
         await Role.findOrCreate({
@@ -50,8 +50,31 @@ const seedRoles = async () => {
     }
 };
 
+// Alapértelmezett admin felhasználó hozzáadása
+const seedAdminUser = async () => {
+  const adminRole = await Role.findOne({ where: { name: 'admin' } });
+  if (!adminRole) return;
+
+  const existing = await User.findOne({ where: { username: 'admin' } });
+  if (!existing) {
+    const bcrypt = require('bcrypt');
+    const salt = await bcrypt.genSalt(10);
+    const password_hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, salt);
+    await User.create({
+      firstName: 'Admin',
+      lastName: 'Admin',
+      username: 'admin',
+      email: 'admin@admin.com',
+      password_hash,
+      role_id: adminRole.id
+    });
+    console.log('Alapértelmezett admin fiók létrehozva.');
+  }
+};
+
 sequelize.sync().then(() => {
     seedRoles();
+    seedAdminUser();
 }).catch((err) => {
     console.error('Adatbázis szinkronizálása sikertelen:', err);
 });
