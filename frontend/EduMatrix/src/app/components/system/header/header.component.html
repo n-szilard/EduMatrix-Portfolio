@@ -1,10 +1,30 @@
-<div class="flex justify-content-between border-bottom-1 border-200 px-5 py-1 mb-2">
-    <div class="flex align-items-center gap-3">
-        <i class="pi pi-graduation-cap text-5xl text-primary-500"></i>
-        <h2 class="text-primary-500">EduMatrix</h2>
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+    
+    <a class="nav-logo" routerLink="/">
+      <div class="logo-icon">
+        <i class="pi pi-graduation-cap"></i>
+      </div>
+      <span class="logo-text">EduMatrix</span>
+    </a>
+
+    <ul class="nav-links" [class.open]="menuOpen">
+      <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Főoldal</a></li>
+      <li><a routerLink="/features" routerLinkActive="active">Funkciók</a></li>
+      <li><a routerLink="/about" routerLinkActive="active">Rólunk</a></li>
+      <li><a routerLink="/contact" routerLinkActive="active">Kapcsolat</a></li>
+    </ul>
+
+    <div class="nav-actions" [class.open]="menuOpen">
+      <a routerLink="/login" class="btn-ghost">Bejelentkezés</a>
+      <a routerLink="/register" class="btn-primary">Regisztráció</a>
     </div>
 
-    <div class="flex align-items-center">
-        <p>Súgó</p>
-    </div>
-</div>
+    <button class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+  </div>
+</nav>
