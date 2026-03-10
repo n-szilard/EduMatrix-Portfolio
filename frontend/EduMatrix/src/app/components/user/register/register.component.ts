@@ -38,13 +38,6 @@ export class RegisterComponent implements OnInit {
   successMessage: string = '';
   loading: boolean = false;
 
-  roles: { label: string; value: string }[] = [
-    { label: 'Adminisztrátor', value: 'admin' },
-    { label: 'Tanár', value: 'teacher' },
-    { label: 'Tanuló', value: 'student' },
-    { label: 'Szülő', value: 'parent' }
-  ];
-
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -59,7 +52,6 @@ export class RegisterComponent implements OnInit {
       username: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', Validators.required],
-      role: ['', Validators.required],
       acceptTerms: [false]
     });
   }
