@@ -1,0 +1,35 @@
+<div class="flex flex-column align-items-center justify-content-center min-h-screen px-4 py-6">
+  <!-- Icon -->
+  <div class="relative mb-5">
+    <div class="flex align-items-center justify-content-center border-circle bg-primary-900" style="width:8rem;height:8rem">
+      <i class="pi  pi-clock text-primary" style="font-size:3.5rem"></i>
+    </div>
+  </div>
+
+  <!-- Title -->
+  <h1 class="text-white text-4xl font-bold m-0 mb-2">Köszönjük a regisztrációt!</h1>
+  <h2 class="text-primary text-xl font-semibold m-0 mb-5">Fiók jóváhagyása folyamatban</h2>
+
+  <!-- Card -->
+  <p-card styleClass="surface-800 border-1 border-round-xl mb-5" [style]="{'max-width':'520px','width':'100%'}">
+    <p class="text-300 text-lg line-height-3 m-0 mb-3">
+      A regisztrációd sikeres volt. Jelenleg egy adminisztrátor jóváhagyására várunk,
+      hogy hozzáférhess a rendszeredhez.
+    </p>
+    <p class="text-400 text-base m-0">
+      <i>Kérjük, nézz vissza később. Általában 24 órán belül feldolgozzuk a kérelmeket.</i>
+    </p>
+  </p-card>
+
+  <!-- Buttons -->
+  <div class="flex flex-column sm:flex-row gap-3 w-full justify-content-center mb-5" style="max-width:520px">
+    
+    <p-button
+      label="Kijelentkezés"
+      icon="pi pi-sign-out"
+      severity="secondary"
+      styleClass="flex-1"
+      (onClick)="logout()">
+    </p-button>
+  </div>
+</div>
