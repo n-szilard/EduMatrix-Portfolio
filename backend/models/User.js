@@ -31,6 +31,10 @@ module.exports = (sequelize) => {
         unique: true,
         validate: { isEmail: true },
       },
+      full_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       role_id: {
         type: DataTypes.UUID,
         allowNull: false,

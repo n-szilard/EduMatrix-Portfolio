@@ -1,0 +1,49 @@
+<header class="topbar flex align-items-center justify-content-between sticky top-0 z-5 surface-card border-bottom-1 surface-border px-5 py-3">
+  <div class="flex align-items-center gap-4 flex-1">
+    <h2 class="text-color font-bold text-xl m-0">{{ title }}</h2>
+
+    @if (showSearch) {
+      <p-iconfield class="flex-1 max-w-20rem">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          pInputText
+          type="text"
+          [placeholder]="searchPlaceholder"
+          class="w-full"
+        />
+      </p-iconfield>
+    }
+  </div>
+
+  <div class="flex align-items-center gap-3">
+    @if (showActions) {
+      <p-button
+        icon="pi pi-bell"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        pTooltip="Értesítések"
+      />
+      <p-button
+        icon="pi pi-comments"
+        [rounded]="true"
+        [text]="true"
+        severity="secondary"
+        pTooltip="Üzenetek"
+      />
+    }
+
+    <p-divider layout="vertical" styleClass="mx-1" />
+
+    <div class="flex align-items-center gap-3">
+      @if (avatarImage) {
+        <p-avatar [image]="avatarImage" shape="circle" size="normal" />
+      }
+
+      <div class="hidden md:flex flex-column">
+        <span class="text-color font-semibold text-sm line-height-2">{{ userName }}</span>
+        <span class="text-color-secondary text-xs">{{ userRoleLabel }}</span>
+      </div>
+    </div>
+  </div>
+</header>

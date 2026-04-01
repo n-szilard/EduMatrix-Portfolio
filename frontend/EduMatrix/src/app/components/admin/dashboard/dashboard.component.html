@@ -1,0 +1,139 @@
+<div class="dashboard-wrapper flex h-screen overflow-hidden">
+
+  <app-admin-sidebar [navLinks]="navLinks" />
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-column overflow-y-auto">
+
+    <app-admin-topbar
+      title="Felhasználók"
+      userName="PLACEHOLDER"
+      userRoleLabel="Adminisztrátor"
+    />
+
+    <!-- Dashboard Content -->
+    <div class="p-5 flex flex-column gap-5 max-w-screen-xl mx-auto w-full">
+
+  <!-- Statisztika kártyák -->
+      <div class="grid">
+        @for (stat of statCards; track stat.label) {
+          <div class="col-12 md:col-4">
+            <p-card styleClass="h-full stat-card">
+              <div class="flex flex-column gap-2">
+                <div class="flex align-items-center justify-content-between">
+                  <span class="text-color-secondary text-sm font-medium">{{ stat.label }}</span>
+                  <i [class]="stat.icon + ' text-primary text-xl'"></i>
+                </div>
+                <span class="text-color font-bold text-4xl">{{ stat.value }}</span>
+                <div class="flex align-items-center gap-2 mt-1">
+                  <p-tag
+                    [value]="stat.badgeLabel"
+                    [styleClass]="stat.badgeClass"
+                  />
+                  <span class="text-color-secondary text-xs">{{ stat.subLabel }}</span>
+                </div>
+              </div>
+            </p-card>
+          </div>
+        }
+      </div>
+
+  <!-- Grafikon + aktivitások -->
+      <div class="grid">
+
+        <!-- Performance Chart -->
+        <div class="col-12 lg:col-8">
+          <p-card styleClass="h-full">
+            <ng-template #header>
+              <div class="flex justify-content-between align-items-start px-4 pt-4">
+                <div>
+                  <h3 class="text-color font-bold text-lg m-0">Tanulmányi Teljesítmény Trendje</h3>
+                  <div class="flex align-items-center gap-2 mt-1">
+                    <span class="text-color-secondary text-sm">Átlagos GPA az összes tanszéken</span>
+                    <span class="text-green-500 text-sm font-bold">+0.4 pont</span>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <p-button label="Utolsó 6 hónap" size="small" [outlined]="true" severity="secondary" />
+                  <p-button icon="pi pi-ellipsis-h" size="small" [text]="true" severity="secondary" />
+                </div>
+              </div>
+            </ng-template>
+
+            <div class="flex flex-column gap-4">
+              <div>
+                <span class="text-primary font-bold text-4xl">3.4</span>
+                <span class="text-color-secondary text-sm ml-2">átlagos pontszám</span>
+              </div>
+
+              <!-- Chart.js Chart -->
+              <div class="chart-container w-full relative">
+                <canvas #performanceCanvas height="200"></canvas>
+                <!-- Month labels -->
+                <div class="flex justify-content-between mt-2 px-1">
+                  @for (month of chartMonths; track month) {
+                    <span class="text-color-secondary text-xs font-bold uppercase">{{ month }}</span>
+                  }
+                </div>
+              </div>
+            </div>
+          </p-card>
+        </div>
+
+        <!-- Activity Logs -->
+        <div class="col-12 lg:col-4">
+          <p-card styleClass="h-full flex flex-column">
+            <ng-template #header>
+              <div class="px-4 pt-4 pb-3 border-bottom-1 surface-border">
+                <h3 class="text-color font-bold text-lg m-0">Rendszertevékenység napló</h3>
+              </div>
+            </ng-template>
+
+            <div class="flex flex-column flex-1">
+              @for (log of activityLogs; track log.title; let last = $last) {
+                <div class="flex gap-3 py-3 align-items-start"
+                     [class.border-bottom-1]="!last"
+                     [class.surface-border]="!last">
+                  <div class="log-icon flex-shrink-0 flex align-items-center justify-content-center border-circle"
+                       [class]="log.iconBg">
+                    <i [class]="log.icon + ' ' + log.iconColor + ' text-sm'"></i>
+                  </div>
+                  <div class="flex flex-column gap-1 flex-1 min-w-0">
+                    <span class="text-color font-semibold text-sm">{{ log.title }}</span>
+                    <span class="text-color-secondary text-xs">{{ log.description }}</span>
+                    <span class="text-400 text-xs font-medium mt-1">{{ log.time }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+
+            <ng-template #footer>
+              <div class="text-center pt-2">
+                <p-button label="Összes napló megtekintése" [link]="true" size="small" />
+              </div>
+            </ng-template>
+          </p-card>
+        </div>
+      </div>
+
+      <!-- ─── Quick Actions ─── -->
+      <div class="flex flex-column gap-3">
+        <h3 class="text-color font-bold text-lg m-0 px-1">Gyors műveletek</h3>
+        <div class="grid">
+          @for (action of quickActions; track action.label) {
+            <div class="col-6 md:col-3">
+              <p-button
+                [label]="action.label"
+                [icon]="action.icon"
+                severity="secondary"
+                [outlined]="true"
+                styleClass="quick-action-btn w-full flex-column gap-3 py-4"
+              />
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>

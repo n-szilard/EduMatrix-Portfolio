@@ -24,10 +24,6 @@ module.exports = (sequelize) => {
         unique: true,
         references: { model: 'users', key: 'id' },
       },
-      full_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
       class_id: {
         type: DataTypes.UUID,
         allowNull: true,
