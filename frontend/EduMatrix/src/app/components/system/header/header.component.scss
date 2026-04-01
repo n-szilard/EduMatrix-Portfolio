@@ -1,10 +1,10 @@
-// ── Változók ──────────────────────────────────────────────
+// Változók
 $blue:       #3b82f6;
 $blue-dark:  #1d4ed8;
 $bg-dark:    rgba(10, 12, 20, 0.92);
 $bg-mobile:  rgba(10, 12, 20, 0.97);
 
-// ── Navbar ────────────────────────────────────────────────
+// Navbar
 .navbar {
   position: fixed;
   inset: 0 0 auto 0;
@@ -23,7 +23,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   }
 }
 
-// ── Konténer ──────────────────────────────────────────────
+// Konténer
 .nav-container {
   max-width: 1280px;
   margin: 0 auto;
@@ -33,7 +33,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   justify-content: space-between;
 }
 
-// ── Logo ──────────────────────────────────────────────────
+// Logo
 .nav-logo {
   display: flex;
   align-items: center;
@@ -62,7 +62,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   }
 }
 
-// ── Navigációs linkek ─────────────────────────────────────
+// Navigációs linkek
 .nav-links {
   display: flex;
   align-items: center;
@@ -86,7 +86,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   }
 }
 
-// ── Gombok ────────────────────────────────────────────────
+// Gombok
 .nav-actions {
   display: flex;
   align-items: center;
@@ -130,7 +130,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   }
 }
 
-// ── Hamburger ─────────────────────────────────────────────
+// Hamburger
 .hamburger {
   display: none;
   flex-direction: column;
@@ -156,7 +156,7 @@ $bg-mobile:  rgba(10, 12, 20, 0.97);
   }
 }
 
-// ── Mobil nézet ───────────────────────────────────────────
+// Mobil nézet
 @media (max-width: 768px) {
   .hamburger { display: flex; }
   .navbar { padding: 0; }

@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  height: 100vh;
+  flex: 0 0 auto;
+}
+
+aside.sidebar {
+  height: 100%;
+}
+
+.brand-icon {
+  background: var(--p-primary-500);
+}
+
+.nav-link {
+  color: inherit;
+}
+
+.nav-link--active {
+  background-color: var(--p-primary-500) !important;
+  color: #fff !important;
+
+  i,
+  span {
+    color: #fff !important;
+  }
+}

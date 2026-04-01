@@ -1,0 +1,99 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export type RoleName = 'admin' | 'teacher' | 'student' | 'parent' | 'pending';
+
+export interface RoleDto {
+  id: string;
+  name: RoleName;
+}
+
+export interface UserDto {
+  id: string;
+  username: string;
+  email: string;
+  full_name: string;
+  role_id: string;
+  Role?: RoleDto;
+}
+
+export interface CreateUserPayload {
+  username: string;
+  email: string;
+  full_name: string;
+  password: string;
+  role_id: string;
+}
+
+export interface UpdateUserPayload {
+  username?: string;
+  email?: string;
+  full_name?: string;
+  password?: string;
+  role_id?: string;
+}
+
+export interface ActivatePendingPayload {
+  role: 'student' | 'teacher';
+  class_id?: string | null;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+
+  // TODO: later move to environment.ts
+  private readonly apiBaseUrl = 'http://localhost:4000/api';
+
+  constructor(private http: HttpClient) { }
+
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  }
+
+  getRoles(): Observable<RoleDto[]> {
+    return this.http.get<RoleDto[]>(`${this.apiBaseUrl}/users/roles`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  getUsers(): Observable<UserDto[]> {
+    return this.http.get<UserDto[]>(`${this.apiBaseUrl}/users`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  createUser(payload: CreateUserPayload): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.apiBaseUrl}/users`, payload, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  updateUser(userId: string, payload: UpdateUserPayload): Observable<UserDto> {
+    return this.http.put<UserDto>(`${this.apiBaseUrl}/users/${encodeURIComponent(userId)}`, payload, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  deleteUser(userId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiBaseUrl}/users/${encodeURIComponent(userId)}`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  activatePending(userId: string, payload: ActivatePendingPayload): Observable<{ message: string; userId: string; role: string }>
+  {
+    return this.http.put<{ message: string; userId: string; role: string }>(
+      `${this.apiBaseUrl}/users/${encodeURIComponent(userId)}/activate`,
+      payload,
+      { headers: this.authHeaders() }
+    );
+  }
+}

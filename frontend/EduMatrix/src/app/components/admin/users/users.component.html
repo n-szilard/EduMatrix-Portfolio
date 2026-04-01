@@ -1,0 +1,351 @@
+<p-toast position="top-right" />
+<p-confirmDialog styleClass="confirm-delete-dialog" />
+
+<div class="flex h-screen overflow-hidden">
+
+  <app-admin-sidebar [navLinks]="navLinks" />
+
+  <main class="flex-1 flex flex-column overflow-y-auto">
+
+    <app-admin-topbar
+      title="Felhasználók"
+      userName="PLACEHOLDER"
+      userRoleLabel="Adminisztrátor"
+    />
+
+    <!-- Page Body -->
+    <div class="flex flex-column gap-5 p-5">
+
+      <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-color font-bold text-2xl m-0">Felhasználók kezelése</h2>
+          <p class="text-color-secondary text-sm mt-1 mb-0">Fiókok, szerepkörök és jogosultságok kezelése az EduMatrix rendszerben.</p>
+        </div>
+        <p-button
+          label="Felhasználó hozzáadása"
+          icon="pi pi-user-plus"
+          (onClick)="openAddDialog()"
+        />
+      </div>
+
+      <div class="grid">
+        <div class="col-6 md:col-3">
+          <div class="role-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="role-icon role-icon--admin flex align-items-center justify-content-center border-circle flex-shrink-0">
+              <i class="pi pi-shield"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Adminok</div>
+              <div class="text-color font-bold text-2xl">{{ countByRole('admin') }}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-6 md:col-3">
+          <div class="role-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="role-icon role-icon--pending flex align-items-center justify-content-center border-circle flex-shrink-0">
+              <i class="pi pi-clock"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Függőben</div>
+              <div class="text-color font-bold text-2xl">{{ countByRole('pending') }}</div>
+            </div>
+          </div>
+        </div>
+  <div class="col-6 md:col-3">
+          <div class="role-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="role-icon role-icon--teacher flex align-items-center justify-content-center border-circle flex-shrink-0">
+              <i class="pi pi-graduation-cap"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Tanárok</div>
+              <div class="text-color font-bold text-2xl">{{ countByRole('teacher') }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 md:col-3">
+          <div class="role-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="role-icon role-icon--student flex align-items-center justify-content-center border-circle flex-shrink-0">
+              <i class="pi pi-book"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Tanulók</div>
+              <div class="text-color font-bold text-2xl">{{ countByRole('student') }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 md:col-3">
+          <div class="role-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="role-icon role-icon--parent flex align-items-center justify-content-center border-circle flex-shrink-0">
+              <i class="pi pi-heart"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Szülők</div>
+              <div class="text-color font-bold text-2xl">{{ countByRole('parent') }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p-table
+        [value]="users()"
+        [paginator]="true"
+        [rows]="8"
+        [rowsPerPageOptions]="[8, 15, 25]"
+        [globalFilterFields]="['username', 'email', 'full_name', 'role.name']"
+        dataKey="id"
+        styleClass="p-datatable-sm users-table"
+        [tableStyle]="{'min-width': '60rem'}"
+        #dt
+      >
+        <ng-template #caption>
+          <div class="flex align-items-center justify-content-between flex-wrap gap-3 pb-2">
+            <span class="text-color font-semibold">Összes felhasználó
+              <span class="text-color-secondary font-normal text-sm ml-2">({{ users().length }} összesen)</span>
+            </span>
+            <p-iconfield>
+              <p-inputicon styleClass="pi pi-search" />
+              <input
+                pInputText
+                type="text"
+                placeholder="Felhasználó keresése…"
+                (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                class="w-17rem"
+              />
+            </p-iconfield>
+          </div>
+        </ng-template>
+
+        <ng-template #header>
+          <tr>
+            <th pSortableColumn="full_name" style="width: 28%">Felhasználó <p-sortIcon field="full_name" /></th>
+            <th pSortableColumn="email"     style="width: 25%">E-mail <p-sortIcon field="email" /></th>
+            <th pSortableColumn="role.name" style="width: 15%">Szerepkör <p-sortIcon field="role.name" /></th>
+            <th style="width: 18%">Szerepkör módosítása</th>
+            <th style="width: 14%; text-align: right">Műveletek</th>
+          </tr>
+        </ng-template>
+
+        <ng-template #body let-user>
+          <tr class="user-row">
+
+            <!-- User identity -->
+            <td>
+              <div class="flex align-items-center gap-3">
+                <p-avatar
+                  [label]="getAvatarLabel(user)"
+                  shape="circle"
+                  [styleClass]="'avatar-' + getRoleName(user)"
+                  size="normal"
+                />
+                <div class="flex flex-column gap-0">
+                  <span class="text-color font-semibold text-sm">{{ user.full_name || '—' }}</span>
+                  <span class="text-color-secondary text-xs">{{ user.username }}</span>
+                  @if (user.class_name) {
+                    <span class="text-xs text-primary font-medium">{{ user.class_name }}. osztály</span>
+                  }
+                </div>
+              </div>
+            </td>
+
+            <td>
+              <span class="text-color-secondary text-sm">{{ user.email }}</span>
+            </td>
+
+            <!-- Role badge -->
+            <td>
+              <p-tag
+                [value]="roleLabelMap[getRoleName(user)]"
+                [severity]="$any(roleSeverityMap[getRoleName(user)])"
+                [icon]="roleIconMap[getRoleName(user)]"
+              />
+            </td>
+
+            <!-- Quick role change -->
+            <td>
+              <p-select
+                [options]="roleOptions()"
+                [(ngModel)]="user.role_id"
+                optionLabel="label"
+                optionValue="value"
+                placeholder="Szerepkör módosítása…"
+                styleClass="w-full role-select"
+                [appendTo]="'body'"
+                [disabled]="getRoleName(user) !== 'pending'"
+                (onChange)="changeRole(user, $event.value)"
+              />
+            </td>
+
+            <!-- Actions -->
+            <td>
+              <div class="flex align-items-center justify-content-end gap-2">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true" [text]="true"
+                  severity="info" size="small"
+                  pTooltip="Szerkesztés" tooltipPosition="top"
+                  (onClick)="openEditDialog(user)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true" [text]="true"
+                  severity="danger" size="small"
+                  pTooltip="Törlés" tooltipPosition="top"
+                  (onClick)="confirmDelete(user, $event)"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <!-- Empty state -->
+        <ng-template #emptymessage>
+          <tr>
+            <td colspan="5">
+              <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
+                <i class="pi pi-users text-color-secondary" style="font-size: 3rem;"></i>
+                <span class="text-color-secondary text-lg font-medium">Nem található felhasználó</span>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+    </div>
+  </main>
+</div>
+
+<!-- ─── Add / Edit Dialog ──────────────────────────────────────────────────── -->
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [header]="isEditMode() ? 'Felhasználó szerkesztése' : 'Új felhasználó hozzáadása'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="user-dialog"
+  [style]="{ width: '32rem' }"
+  (onHide)="closeDialog()"
+>
+  <form [formGroup]="form" class="flex flex-column gap-4 pt-2">
+
+    <!-- Full Name -->
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">Teljes név <span class="text-red-500">*</span></label>
+      <input
+        pInputText
+        formControlName="full_name"
+        placeholder="pl. Kiss János"
+        [class.ng-invalid]="isInvalid('full_name')"
+        [class.ng-dirty]="isInvalid('full_name')"
+      />
+      @if (isInvalid('full_name')) {
+        <small class="text-red-500">A teljes név megadása kötelező.</small>
+      }
+    </div>
+
+    <!-- Username -->
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">Felhasználónév <span class="text-red-500">*</span></label>
+      <input
+        pInputText
+        formControlName="username"
+        placeholder="pl. kiss_janos"
+        [class.ng-invalid]="isInvalid('username')"
+        [class.ng-dirty]="isInvalid('username')"
+      />
+      @if (isInvalid('username')) {
+        <small class="text-red-500">A felhasználónév legalább 3 karakter legyen.</small>
+      }
+    </div>
+
+    <!-- Email -->
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">E-mail <span class="text-red-500">*</span></label>
+      <input
+        pInputText
+        type="email"
+        formControlName="email"
+        placeholder="pl. kiss.janos@edumatrix.hu"
+        [class.ng-invalid]="isInvalid('email')"
+        [class.ng-dirty]="isInvalid('email')"
+      />
+      @if (isInvalid('email')) {
+        <small class="text-red-500">Érvényes e-mail cím megadása kötelező.</small>
+      }
+    </div>
+
+    <!-- Role -->
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">Szerepkör <span class="text-red-500">*</span></label>
+      <p-select
+        formControlName="role_id"
+        [options]="roleOptions()"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Válasszon szerepkört"
+        styleClass="w-full"
+        [appendTo]="'body'"
+        [class.ng-invalid]="isInvalid('role_id')"
+        [class.ng-dirty]="isInvalid('role_id')"
+      >
+        <ng-template #selectedItem let-opt>
+          <div class="flex align-items-center gap-2" *ngIf="opt">
+            <i [class]="roleIconMap[asRoleName(opt.name)]"></i>
+            <span>{{ opt.label }}</span>
+          </div>
+        </ng-template>
+        <ng-template #item let-opt>
+          <div class="flex align-items-center gap-2">
+            <i [class]="roleIconMap[asRoleName(opt.name)]"></i>
+            <span>{{ opt.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+      @if (isInvalid('role_id')) {
+        <small class="text-red-500">Kérjük válasszon szerepkört.</small>
+      }
+    </div>
+
+    <!-- Password -->
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">
+        Jelszó
+        @if (!isEditMode()) { <span class="text-red-500">*</span> }
+        @if (isEditMode()) { <span class="text-color-secondary font-normal">(hagyja üresen a jelenlegi megtartásához)</span> }
+      </label>
+      <p-password
+        formControlName="password"
+        [feedback]="true"
+        [toggleMask]="true"
+        styleClass="w-full"
+        inputStyleClass="w-full"
+        placeholder="{{ isEditMode() ? 'Adjon meg új jelszót…' : 'Min. 8 karakter' }}"
+        [class.ng-invalid]="isInvalid('password')"
+        [class.ng-dirty]="isInvalid('password')"
+      />
+      @if (isInvalid('password')) {
+        <small class="text-red-500">A jelszónak legalább 8 karakternek kell lennie.</small>
+      }
+    </div>
+
+  </form>
+
+  <!-- Dialog Footer -->
+  <ng-template #footer>
+    <div class="flex justify-content-end gap-2 pt-2">
+      <p-button
+        label="Mégsem"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="closeDialog()"
+      />
+      <p-button
+        [label]="isEditMode() ? 'Mentés' : 'Felhasználó létrehozása'"
+        [icon]="submitting() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+        [disabled]="submitting()"
+        (onClick)="saveUser()"
+      />
+    </div>
+  </ng-template>
+</p-dialog>

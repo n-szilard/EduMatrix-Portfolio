@@ -1,0 +1,47 @@
+<aside class="sidebar flex flex-column border-right-1 surface-border surface-card p-4 flex-shrink-0">
+  <div class="flex flex-column gap-4 h-full">
+
+    <!-- Brand -->
+    <div class="flex align-items-center gap-3 px-2">
+      <div class="brand-icon flex align-items-center justify-content-center border-round-lg p-2">
+        <i class="pi pi-graduation-cap text-white text-xl"></i>
+      </div>
+      <div class="flex flex-column">
+        <span class="text-color font-bold text-lg line-height-2">EduMatrix</span>
+        <span class="text-color-secondary text-xs">Admin Portál</span>
+      </div>
+    </div>
+
+    <!-- Nav Links -->
+    <nav class="flex flex-column gap-1 flex-1">
+      @for (link of navLinks; track link.label) {
+        <a
+          class="nav-link flex align-items-center gap-3 px-3 py-2 border-round-lg cursor-pointer no-underline transition-all transition-duration-200"
+          [routerLink]="link.routerLink"
+          routerLinkActive="nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <i [class]="link.icon + ' text-color-secondary'"></i>
+          <span class="text-sm font-medium text-color">{{ link.label }}</span>
+        </a>
+      }
+
+      <p-divider />
+
+      <a class="nav-link flex align-items-center gap-3 px-3 py-2 border-round-lg cursor-pointer no-underline transition-all transition-duration-200">
+        <i class="pi pi-cog text-color-secondary"></i>
+        <span class="text-sm font-medium text-color">Beállítások</span>
+      </a>
+    </nav>
+
+    <!-- Sign Out -->
+    <p-button
+      label="Kijelentkezés"
+      icon="pi pi-sign-out"
+      [outlined]="true"
+      severity="secondary"
+      styleClass="w-full justify-content-center"
+      (onClick)="signOut()"
+    />
+  </div>
+</aside>

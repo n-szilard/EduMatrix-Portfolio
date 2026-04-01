@@ -1,0 +1,135 @@
+// ─── Layout ───────────────────────────────────────────────────────────────────
+
+.dashboard-wrapper {
+  height: 100vh;
+}
+
+// ─── Sidebar ──────────────────────────────────────────────────────────────────
+
+.sidebar {
+  width: 16rem;
+  min-width: 16rem;
+}
+
+.brand-icon {
+  background-color: var(--p-primary-500);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+// ─── Navigation Links ─────────────────────────────────────────────────────────
+
+.nav-link {
+  color: var(--p-text-color);
+  text-decoration: none;
+
+  &:hover {
+    background-color: var(--p-content-hover-background);
+  }
+
+  &--active {
+    background-color: var(--p-primary-500) !important;
+    color: #fff !important;
+
+    i,
+    span {
+      color: #fff !important;
+    }
+  }
+}
+
+// ─── Topbar ───────────────────────────────────────────────────────────────────
+
+.topbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+// ─── Stat Cards ───────────────────────────────────────────────────────────────
+
+.stat-card {
+  transition: box-shadow 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  }
+}
+
+// ─── Tag / Badge overrides ────────────────────────────────────────────────────
+
+:host ::ng-deep {
+  .badge-success {
+    background-color: color-mix(in srgb, #078838 15%, transparent) !important;
+    color: #078838 !important;
+    font-weight: 700;
+  }
+
+  .badge-primary {
+    background-color: color-mix(in srgb, var(--p-primary-500) 15%, transparent) !important;
+    color: var(--p-primary-500) !important;
+    font-weight: 700;
+  }
+
+  // ─── Chart ──────────────────────────────────────────────────────────────
+
+  .chart-container svg {
+    display: block;
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .chart-container {
+    height: 200px;
+
+    canvas {
+      display: block;
+      width: 100% !important;
+      height: 200px !important;
+      border-radius: 0.5rem;
+      overflow: hidden;
+    }
+  }
+
+  // ─── Quick Action Buttons ────────────────────────────────────────────────
+
+  .quick-action-btn {
+    .p-button-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+    }
+
+    .p-button-icon {
+      font-size: 1.5rem;
+    }
+
+    &:hover {
+      border-color: var(--p-primary-500) !important;
+      background-color: color-mix(in srgb, var(--p-primary-500) 5%, transparent) !important;
+      color: var(--p-primary-500) !important;
+    }
+  }
+}
+
+// ─── Activity Log Icons ───────────────────────────────────────────────────────
+
+.log-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+}
+
+.log-icon-success {
+  background-color: color-mix(in srgb, #078838 12%, transparent);
+}
+
+.log-icon-primary {
+  background-color: color-mix(in srgb, var(--p-primary-500) 12%, transparent);
+}
+
+.log-icon-warning {
+  background-color: color-mix(in srgb, #f97316 12%, transparent);
+}
+
+.log-icon-danger {
+  background-color: color-mix(in srgb, #ef4444 12%, transparent);
+}

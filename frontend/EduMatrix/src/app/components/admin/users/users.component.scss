@@ -1,0 +1,148 @@
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+
+.sidebar {
+  width: 16rem;
+  min-width: 16rem;
+}
+
+.brand-icon {
+  background-color: var(--p-primary-500);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.nav-link {
+  color: var(--p-text-color);
+  text-decoration: none;
+
+  &:hover {
+    background-color: var(--p-content-hover-background);
+  }
+
+  &--active {
+    background-color: var(--p-primary-500) !important;
+    color: #fff !important;
+
+    i, span {
+      color: #fff !important;
+    }
+  }
+}
+
+.topbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+// ─── Role Summary Cards ───────────────────────────────────────────────────────
+
+.role-summary-card {
+  transition: box-shadow 0.2s, transform 0.2s;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.07);
+    transform: translateY(-1px);
+  }
+}
+
+.role-icon {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.1rem;
+
+  &--admin {
+    background: color-mix(in srgb, #ef4444 12%, transparent);
+    color: #ef4444;
+  }
+  &--pending {
+    background: color-mix(in srgb, #64748b 12%, transparent);
+    color: #64748b;
+  }
+  &--teacher {
+    background: color-mix(in srgb, var(--p-primary-500) 12%, transparent);
+    color: var(--p-primary-500);
+  }
+  &--student {
+    background: color-mix(in srgb, #22c55e 12%, transparent);
+    color: #22c55e;
+  }
+  &--parent {
+    background: color-mix(in srgb, #f97316 12%, transparent);
+    color: #f97316;
+  }
+}
+
+// ─── Table ────────────────────────────────────────────────────────────────────
+
+.user-row {
+  transition: background 0.15s;
+}
+
+// ─── Role-coloured Avatars ────────────────────────────────────────────────────
+
+:host ::ng-deep {
+  .avatar-admin .p-avatar {
+    background: color-mix(in srgb, #ef4444 18%, transparent) !important;
+    color: #ef4444 !important;
+    font-weight: 700;
+  }
+
+  .avatar-pending .p-avatar {
+    background: color-mix(in srgb, #64748b 18%, transparent) !important;
+    color: #64748b !important;
+    font-weight: 700;
+  }
+
+  .avatar-teacher .p-avatar {
+    background: color-mix(in srgb, var(--p-primary-500) 18%, transparent) !important;
+    color: var(--p-primary-500) !important;
+    font-weight: 700;
+  }
+
+  .avatar-student .p-avatar {
+    background: color-mix(in srgb, #22c55e 18%, transparent) !important;
+    color: #22c55e !important;
+    font-weight: 700;
+  }
+
+  .avatar-parent .p-avatar {
+    background: color-mix(in srgb, #f97316 18%, transparent) !important;
+    color: #f97316 !important;
+    font-weight: 700;
+  }
+
+  // Avatar betű-jelölés (monogram) stílus
+  p-avatar[styleclass*='avatar-'] .p-avatar-text {
+    font-weight: 700;
+    font-size: 0.8rem;
+  }
+
+  // ─── Role Select in table ──────────────────────────────────────────────────
+  .role-select .p-select {
+    min-width: 9rem;
+  }
+
+  // ─── Dialog ───────────────────────────────────────────────────────────────
+  .user-dialog .p-dialog-content {
+    padding-top: 0.5rem;
+  }
+
+  // ─── Confirm Delete Dialog ─────────────────────────────────────────────────
+  .confirm-delete-dialog .p-dialog-header {
+    padding-bottom: 0.75rem;
+  }
+
+  .confirm-delete-dialog .p-confirmdialog-message {
+    line-height: 1.6;
+  }
+
+  // ─── Password input full width ─────────────────────────────────────────────
+  .p-password {
+    display: flex;
+    width: 100%;
+
+    .p-inputtext {
+      flex: 1;
+    }
+  }
+}
