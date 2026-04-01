@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/user/login/login.component';
 import { HomeComponent } from './components/home/home.component';
 import { RegisterComponent } from './components/user/register/register.component';
+import { PendingComponent } from './components/system/pending/pending.component';
 import { DashboardComponent } from './components/admin/dashboard/dashboard.component';
 import { UsersComponent } from './components/admin/users/users.component';
 
@@ -9,6 +10,7 @@ export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
+    { path: 'pending', component: PendingComponent },
     {
         path: 'admin',
         children: [
@@ -17,9 +19,5 @@ export const routes: Routes = [
             { path: 'users', component: UsersComponent },
         ],
     },
-
-    // Backward compatible routes (optional)
-    { path: 'dashboard', pathMatch: 'full', redirectTo: 'admin/dashboard' },
-    { path: 'users', pathMatch: 'full', redirectTo: 'admin/users' },
 
 ];
