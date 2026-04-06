@@ -9,7 +9,7 @@
 
     <app-admin-topbar
       title="Felhasználók"
-      userName="PLACEHOLDER"
+      [userName]="adminName()"
       userRoleLabel="Adminisztrátor"
     />
 
@@ -165,7 +165,7 @@
             <td>
               <p-select
                 [options]="roleOptions()"
-                [(ngModel)]="user.role_id"
+                [(ngModel)]="user.role"
                 optionLabel="label"
                 optionValue="value"
                 placeholder="Szerepkör módosítása…"
@@ -279,15 +279,15 @@
     <div class="flex flex-column gap-2">
       <label class="text-color font-medium text-sm">Szerepkör <span class="text-red-500">*</span></label>
       <p-select
-        formControlName="role_id"
+        formControlName="role"
         [options]="roleOptions()"
         optionLabel="label"
         optionValue="value"
         placeholder="Válasszon szerepkört"
         styleClass="w-full"
         [appendTo]="'body'"
-        [class.ng-invalid]="isInvalid('role_id')"
-        [class.ng-dirty]="isInvalid('role_id')"
+        [class.ng-invalid]="isInvalid('role')"
+        [class.ng-dirty]="isInvalid('role')"
       >
         <ng-template #selectedItem let-opt>
           <div class="flex align-items-center gap-2" *ngIf="opt">
@@ -302,7 +302,7 @@
           </div>
         </ng-template>
       </p-select>
-      @if (isInvalid('role_id')) {
+      @if (isInvalid('role')) {
         <small class="text-red-500">Kérjük válasszon szerepkört.</small>
       }
     </div>

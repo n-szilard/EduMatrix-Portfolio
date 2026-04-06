@@ -47,9 +47,8 @@ export interface User {
   username: string;
   password_hash: string;
   email: string;
-  role_id: string;
+  role: RoleName;
   // Csatolt / számított mezők
-  role?: Role;
   full_name?: string;  // a userből / csatolt táblából (tanuló/tanár profil)
   class_name?: string; // osztály neve (csak tanulóknál)
 }
@@ -100,13 +99,14 @@ export class UsersComponent implements OnInit {
   dialogVisible = signal(false);
   isEditMode = signal(false);
   submitting = signal(false);
+  adminName = signal<string>('Admin');
 
   // Származtatott értékek
   // A gyors szerepkör-váltó dropdown ne engedje visszaállítani „függőben”-re.
   roleOptions = computed(() =>
     this.roles()
       .filter(r => r.name !== 'pending')
-      .map(r => ({ label: this.roleLabelMap[r.name], value: r.id, name: r.name }))
+      .map(r => ({ label: this.roleLabelMap[r.name], value: r.name, name: r.name }))
   );
 
   roleLabelMap: Record<RoleName, string> = {
@@ -144,8 +144,21 @@ export class UsersComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loadAdminName();
     this.buildForm();
     this.loadRolesAndUsers();
+  }
+
+  private loadAdminName(): void {
+    try {
+      const userJson = localStorage.getItem('user');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        this.adminName.set(user.full_name || user.username || 'Admin');
+      }
+    } catch (error) {
+      console.error('Hiba az admin név beolvasásakor:', error);
+    }
   }
 
   private loadRolesAndUsers(): void {
@@ -176,18 +189,15 @@ export class UsersComponent implements OnInit {
   }
 
   private mapUserDtoToUser(dto: UserDto): User {
-    const role: Role | undefined = dto.Role
-      ? { id: dto.Role.id, name: dto.Role.name }
-      : this.roles().find(r => r.id === dto.role_id);
+    const roleName = dto.role ?? 'pending';
 
     return {
       id: dto.id,
       username: dto.username,
       email: dto.email,
       full_name: dto.full_name,
-      role_id: dto.role_id,
       password_hash: '',
-      role,
+      role: roleName,
     };
   }
 
@@ -196,7 +206,7 @@ export class UsersComponent implements OnInit {
       username:  [user?.username  ?? '', [Validators.required, Validators.minLength(3)]],
       email:     [user?.email     ?? '', [Validators.required, Validators.email]],
       full_name: [user?.full_name ?? '', Validators.required],
-      role_id:   [user?.role_id   ?? '', Validators.required],
+      role:      [user?.role      ?? '', Validators.required],
       password:  ['', this.isEditMode() ? [] : [Validators.required, Validators.minLength(8)]],
     });
   }
@@ -236,7 +246,7 @@ export class UsersComponent implements OnInit {
         username: val.username,
         email: val.email,
         full_name: val.full_name,
-        role_id: val.role_id,
+        role: val.role,
         ...(val.password ? { password: val.password } : {}),
       };
 
@@ -259,7 +269,7 @@ export class UsersComponent implements OnInit {
         email: val.email,
         full_name: val.full_name,
         password: val.password,
-        role_id: val.role_id,
+        role: val.role,
       };
 
       this.userService.createUser(payload)
@@ -279,7 +289,7 @@ export class UsersComponent implements OnInit {
   }
 
   // Gyors szerepkör váltás (aktiválás)
-  changeRole(user: User, newRoleId: string): void {
+  changeRole(user: User, newRole: RoleName): void {
   // Frontend védelem: csak a „függőben” felhasználók aktiválhatók (pending -> student/teacher).
     if (this.getRoleName(user) !== 'pending') {
       this.messageService.add({
@@ -291,8 +301,7 @@ export class UsersComponent implements OnInit {
     }
 
   // Backend szerződés: pending -> student/teacher aktiválás
-    const targetRole = this.roles().find(r => r.id === newRoleId);
-    if (!targetRole || !['student', 'teacher'].includes(targetRole.name)) {
+    if (!['student', 'teacher'].includes(newRole)) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Érvénytelen választás',
@@ -302,17 +311,16 @@ export class UsersComponent implements OnInit {
     }
 
     this.submitting.set(true);
-    this.userService.activatePending(user.id, { role: targetRole.name as 'student' | 'teacher' })
+    this.userService.activatePending(user.id, { role: newRole as 'student' | 'teacher' })
       .pipe(finalize(() => this.submitting.set(false)))
       .subscribe({
         next: () => {
           // Lokális frissítés azonnali UI visszajelzéshez
-          const role: Role = { id: targetRole.id, name: targetRole.name };
-          this.users.update(list => list.map(u => u.id === user.id ? { ...u, role_id: targetRole.id, role } : u));
+          this.users.update(list => list.map(u => u.id === user.id ? { ...u, role: newRole } : u));
           this.messageService.add({
             severity: 'success',
             summary: 'Felhasználó aktiválva',
-            detail: `${user.username} új szerepköre: ${this.roleLabelMap[targetRole.name]}.`,
+            detail: `${user.username} új szerepköre: ${this.roleLabelMap[newRole]}.`,
           });
         },
         error: (err) => {
@@ -363,11 +371,11 @@ export class UsersComponent implements OnInit {
   }
 
   getRoleName(user: User): RoleName {
-    return (user.role?.name ?? 'student') as RoleName;
+    return (user.role ?? 'student') as RoleName;
   }
 
   countByRole(roleName: RoleName): number {
-    return this.users().filter(u => u.role?.name === roleName).length;
+    return this.users().filter(u => u.role === roleName).length;
   }
 
   isInvalid(field: string): boolean {
