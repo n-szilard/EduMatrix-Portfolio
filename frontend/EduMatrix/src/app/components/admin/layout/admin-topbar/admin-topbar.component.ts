@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 // PrimeNG
 import { DividerModule } from 'primeng/divider';
@@ -16,6 +17,7 @@ import { TooltipModule } from 'primeng/tooltip';
   standalone: true,
   imports: [
     CommonModule,
+    RouterModule,
     DividerModule,
     ButtonModule,
     AvatarModule,
