@@ -6,7 +6,7 @@ const { User, Role, Student, Teacher, sequelize } = require('../models');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
-// Helper: normalize safe user output
+// Segédfüggvény: biztonságos user kimenet normalizálása
 function toUserDto(userInstance) {
   if (!userInstance) return null;
   const u = userInstance.toJSON ? userInstance.toJSON() : userInstance;
@@ -15,12 +15,11 @@ function toUserDto(userInstance) {
     username: u.username,
     email: u.email,
     full_name: u.full_name,
-    role_id: u.role_id,
-    Role: u.Role ? { id: u.Role.id, name: u.Role.name } : undefined,
+    role: u.Role?.name || null,
   };
 }
 
-// Validation rules
+// Validációs szabályok
 const loginValidation = [
   body('username').trim().notEmpty().withMessage('Felhasználónév megadása kötelező.'),
   body('password').notEmpty().withMessage('Jelszó megadása kötelező.'),
@@ -45,6 +44,15 @@ const registerValidation = [
     .escape()
     .isLength({ min: 1, max: 50 }).withMessage('Vezetéknév megadása kötelező (max. 50 karakter).'),
 ];
+
+async function resolveRoleInput(role) {
+  if (typeof role === 'string' && role.trim()) {
+    const foundByName = await Role.findOne({ where: { name: role.trim().toLowerCase() } });
+    if (foundByName) return foundByName;
+  }
+
+  return null;
+}
 
 // POST /api/users/login
 router.post('/login', loginValidation, async (req, res) => {
@@ -151,16 +159,15 @@ router.post('/register', registerValidation, async (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Admin CRUD for Users (needed by frontend UserService)
+// Admin CRUD felhasználók kezeléséhez (frontend UserService igényli)
 // ─────────────────────────────────────────────────────────────────────────────
 
-// GET /api/users  (admin only)
+// GET /api/users  (csak admin)
 router.get('/', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
     const users = await User.findAll({
       attributes: ['id', 'username', 'email', 'full_name', 'role_id'],
       include: [{ model: Role, attributes: ['id', 'name'] }],
-      order: [['createdAt', 'DESC']],
     });
     return res.json(users.map(toUserDto));
   } catch (error) {
@@ -169,7 +176,7 @@ router.get('/', authenticateToken, authorizeRoles('admin'), async (req, res) => 
   }
 });
 
-// POST /api/users  (admin only)
+// POST /api/users  (csak admin)
 router.post(
   '/',
   authenticateToken,
@@ -179,7 +186,7 @@ router.post(
     body('username').trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
     body('full_name').trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
     body('password').isLength({ min: 8 }).withMessage('A jelszónak legalább 8 karakter hosszúnak kell lennie.'),
-    body('role_id').notEmpty().withMessage('Szerepkör megadása kötelező.'),
+    body('role').trim().notEmpty().withMessage('Szerepkör megadása kötelező.'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -188,7 +195,7 @@ router.post(
     }
 
     try {
-      const { username, email, full_name, password, role_id } = req.body;
+      const { username, email, full_name, password, role } = req.body;
 
       const existingUsername = await User.findOne({ where: { username } });
       if (existingUsername) {
@@ -199,8 +206,8 @@ router.post(
         return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
       }
 
-      const role = await Role.findByPk(role_id);
-      if (!role) {
+      const resolvedRole = await resolveRoleInput(role);
+      if (!resolvedRole) {
         return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
       }
 
@@ -212,7 +219,7 @@ router.post(
         email,
         full_name,
         password_hash,
-        role_id,
+        role_id: resolvedRole.id,
       });
 
       const createdWithRole = await User.findByPk(created.id, {
@@ -228,7 +235,7 @@ router.post(
   }
 );
 
-// PUT /api/users/:id  (admin only)
+// PUT /api/users/:id  (csak admin)
 router.put(
   '/:id',
   authenticateToken,
@@ -238,7 +245,7 @@ router.put(
     body('username').optional().trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
     body('full_name').optional().trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
     body('password').optional().isLength({ min: 8 }).withMessage('A jelszónak legalább 8 karakter hosszúnak kell lennie.'),
-    body('role_id').optional().notEmpty().withMessage('Szerepkör megadása kötelező.'),
+    body('role').optional().isString().withMessage('A szerepkör neve szöveg kell legyen.'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -252,7 +259,7 @@ router.put(
         return res.status(404).json({ message: 'Felhasználó nem található.' });
       }
 
-      const { username, email, full_name, password, role_id } = req.body;
+      const { username, email, full_name, password, role } = req.body;
 
       if (username && username !== user.username) {
         const existingUsername = await User.findOne({ where: { username } });
@@ -271,12 +278,12 @@ router.put(
       if (typeof full_name === 'string') {
         user.full_name = full_name;
       }
-      if (role_id) {
-        const role = await Role.findByPk(role_id);
-        if (!role) {
+      if (role) {
+        const resolvedRole = await resolveRoleInput(role);
+        if (!resolvedRole) {
           return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
         }
-        user.role_id = role_id;
+        user.role_id = resolvedRole.id;
       }
       if (password) {
         const salt = await bcrypt.genSalt(10);
@@ -298,7 +305,7 @@ router.put(
   }
 );
 
-// DELETE /api/users/:id  (admin only)
+// DELETE /api/users/:id  (csak admin)
 router.delete('/:id', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
     const user = await User.findByPk(req.params.id);
@@ -360,7 +367,7 @@ router.put('/:id/activate', authenticateToken, authorizeRoles('admin'), async (r
       return res.status(400).json({ message: 'Csak pending felhasználó aktiválható ezzel az endpointtal.' });
     }
 
-    // Biztonság: ne legyen dupla rekord
+    // Biztonság: ne legyen duplikált rekord
     const [existingStudent, existingTeacher] = await Promise.all([
       Student.findOne({ where: { user_id: userId }, transaction: t }),
       Teacher.findOne({ where: { user_id: userId }, transaction: t }),
@@ -370,7 +377,7 @@ router.put('/:id/activate', authenticateToken, authorizeRoles('admin'), async (r
       return res.status(409).json({ message: 'A felhasználó már hozzá van rendelve student/teacher rekordhoz.' });
     }
 
-    // Létrehozás + role váltás
+    // Student/Teacher rekord létrehozása + szerepkör váltás
     if (role === 'student') {
       await Student.create(
         {

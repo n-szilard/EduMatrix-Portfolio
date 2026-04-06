@@ -1,0 +1,87 @@
+@url = http://localhost:4000/api
+
+### 1) Admin login
+# @name loginAdmin
+POST {{url}}/users/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+### 2) Új felhasználó regisztráció
+# @name registerUser
+POST {{url}}/users/register
+Content-Type: application/json
+
+{
+  "firstName": "Teszt",
+  "lastName": "Elek",
+  "email": "teszt.elek+{{$timestamp}}@example.com",
+  "username": "tesztuser{{$timestamp}}",
+  "password": "Teszt1234"
+}
+
+### 3) Szerepkörök listázása
+# @name getRoles
+GET {{url}}/users/roles
+
+### 4) Összes user listázása (admin)
+# @name getAllUsers
+GET {{url}}/users
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 5) Új user létrehozása (admin)
+# role: csak név kell
+# @name createUser
+POST {{url}}/users
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "username": "admincreated{{$timestamp}}",
+  "email": "admin.created+{{$timestamp}}@example.com",
+  "full_name": "Admin Altal Letrehozott",
+  "password": "Er0sJelszo123",
+  "role": "teacher"
+}
+
+###
+
+# createUser után írd ide a létrehozott user id-t
+@createdUserId = 5e9ffe1d-4b4b-42b1-b275-603076e28cd4
+
+### 6) User frissítése (admin)
+# createdUserId: createUser válaszból másold ide
+# @name updateUser
+PUT {{url}}/users/{{createdUserId}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "full_name": "Frissitett Nev",
+  "password": "UjEr0sJelszo123"
+}
+
+### 7) User törlése (admin)
+# createdUserId: ugyanaz az id
+# @name deleteUser
+DELETE {{url}}/users/{{createdUserId}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 8) Pending user aktiválása (admin)
+# role: student vagy teacher
+# class_id csak student esetén kell
+# pendingUserId: töltsd ki egy pending user id-ra
+@pendingUserId = e8e772ab-6a95-4f40-bfe6-d65cb5ae709e
+
+# @name activatePendingUser
+PUT {{url}}/users/{{pendingUserId}}/activate
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "role": "teacher"
+}
+

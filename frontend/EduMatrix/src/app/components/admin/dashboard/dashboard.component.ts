@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import {
@@ -77,10 +77,11 @@ export interface QuickAction {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   @ViewChild('performanceCanvas') performanceCanvas?: ElementRef<HTMLCanvasElement>;
 
   private performanceChart?: Chart;
+  adminName = signal<string>('Admin');
 
   navLinks = [
   { icon: 'pi pi-home', label: 'Vezérlőpult', routerLink: ['/admin/dashboard'] },
@@ -174,6 +175,22 @@ export class DashboardComponent {
       Tooltip,
       Legend,
     );
+  }
+
+  ngOnInit(): void {
+    this.loadAdminName();
+  }
+
+  private loadAdminName(): void {
+    try {
+      const userJson = localStorage.getItem('user');
+      if (userJson) {
+        const user = JSON.parse(userJson);
+        this.adminName.set(user.full_name || user.username || 'Admin');
+      }
+    } catch (error) {
+      console.error('Hiba az admin név beolvasásakor:', error);
+    }
   }
 
   ngAfterViewInit(): void {

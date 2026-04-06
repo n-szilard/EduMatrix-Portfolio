@@ -14,8 +14,7 @@ export interface UserDto {
   username: string;
   email: string;
   full_name: string;
-  role_id: string;
-  Role?: RoleDto;
+  role: RoleName | null;
 }
 
 export interface CreateUserPayload {
@@ -23,7 +22,7 @@ export interface CreateUserPayload {
   email: string;
   full_name: string;
   password: string;
-  role_id: string;
+  role: RoleName;
 }
 
 export interface UpdateUserPayload {
@@ -31,7 +30,7 @@ export interface UpdateUserPayload {
   email?: string;
   full_name?: string;
   password?: string;
-  role_id?: string;
+  role?: RoleName;
 }
 
 export interface ActivatePendingPayload {
