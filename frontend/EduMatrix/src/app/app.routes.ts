@@ -7,15 +7,17 @@ import { PendingComponent } from './components/system/pending/pending.component'
 import { DashboardComponent } from './components/admin/dashboard/dashboard.component';
 import { UsersComponent } from './components/admin/users/users.component';
 import { NotfoundComponent } from './components/system/notfound/notfound.component';
+import { authGuard, roleGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
     { path: 'register', component: RegisterComponent },
-    { path: 'pending', component: PendingComponent },
+    { path: 'pending', component: PendingComponent, canActivate: [authGuard] },
     {
         path: 'admin',
+        canActivate: [roleGuard(['admin'])],
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: DashboardComponent },
