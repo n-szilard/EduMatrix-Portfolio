@@ -6,6 +6,7 @@ import { LogoutComponent } from './components/user/logout/logout.component';
 import { PendingComponent } from './components/system/pending/pending.component';
 import { DashboardComponent } from './components/admin/dashboard/dashboard.component';
 import { UsersComponent } from './components/admin/users/users.component';
+import { NotfoundComponent } from './components/system/notfound/notfound.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -21,4 +22,5 @@ export const routes: Routes = [
             { path: 'users', component: UsersComponent },
         ],
     },
+    { path: '**', component: NotfoundComponent },
 ];
