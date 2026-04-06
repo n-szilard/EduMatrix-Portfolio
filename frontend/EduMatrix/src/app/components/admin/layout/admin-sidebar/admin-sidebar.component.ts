@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -26,8 +26,9 @@ export class AdminSidebarComponent {
   @Input() userRoleLabel = '—';
   @Input() avatarUrl?: string;
 
-  // Később ide lehet hookolni auth service-t.
+  constructor(private router: Router) {}
+
   signOut() {
-    // noop
+    this.router.navigate(['/logout']);
   }
 }
