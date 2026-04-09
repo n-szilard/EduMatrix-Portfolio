@@ -2,7 +2,7 @@ const app = require('./config/app');
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { sequelize } = require('./models/index')
+const { sequelize, seedInitialData } = require('./models/index')
 
 const PORT = process.env.PORT || 4000;
 
@@ -11,6 +11,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/users', require('./routes/users.routes'));
+app.use('/api/classes', require('./routes/classes.routes'));
 
 // DB sync + szerver indítás
 (async () => {
@@ -18,7 +19,9 @@ app.use('/api/users', require('./routes/users.routes'));
         await sequelize.authenticate();
         console.log('Adatbázis kapcsolat OK');
 
-        await sequelize.sync({ alter: true });
+        const syncAlter = process.env.DB_SYNC_ALTER === 'true';
+        await sequelize.sync(syncAlter ? { alter: true } : undefined);
+        await seedInitialData();
 
         app.listen(PORT, () => console.log(`Szerver fut: http://localhost:${PORT}`));
     } catch (error) {

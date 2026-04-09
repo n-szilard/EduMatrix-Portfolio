@@ -19,7 +19,9 @@ const authenticateToken = (req, res, next) => {
 };
 
 // Szerepkör ellenőrzése, több szerepkör is megadható
-const authorizeRoles = (...roles) => {
+const authorizeRoles = (...rolesInput) => {
+  const roles = rolesInput.flat();
+
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({ message: 'Hozzáférés megtagadva: nincs bejelentkezett felhasználó.' });
