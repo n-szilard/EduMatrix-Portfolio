@@ -279,10 +279,26 @@ router.put(
         user.full_name = full_name;
       }
       if (role) {
+        const currentRole = await Role.findByPk(user.role_id);
+        if (!currentRole) {
+          return res.status(500).json({ message: 'Szerverhiba: a jelenlegi szerepkör nem található.' });
+        }
+
         const resolvedRole = await resolveRoleInput(role);
         if (!resolvedRole) {
           return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
         }
+
+        // Pending felhasználó teacher/student aktiválása csak az activate endpointon megengedett
+        if (currentRole.name === 'pending' && ['teacher', 'student'].includes(resolvedRole.name)) {
+          return res.status(400).json({ message: 'Teacher vagy student szerepkörhöz az aktiválás endpointot használd.' });
+        }
+
+        // Aktiválás után a szerepkör nem módosítható
+        if (currentRole.name !== 'pending' && resolvedRole.id !== user.role_id) {
+          return res.status(400).json({ message: 'Aktiválás után a szerepkör már nem módosítható.' });
+        }
+
         user.role_id = resolvedRole.id;
       }
       if (password) {

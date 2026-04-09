@@ -71,11 +71,9 @@ const seedAdminUser = async () => {
   }
 };
 
-sequelize.sync().then(() => {
-    seedRoles();
-    seedAdminUser();
-}).catch((err) => {
-    console.error('Adatbázis szinkronizálása sikertelen:', err);
-});
+const seedInitialData = async () => {
+    await seedRoles();
+    await seedAdminUser();
+};
 
-module.exports = { sequelize, ...models }
+module.exports = { sequelize, seedInitialData, ...models }
