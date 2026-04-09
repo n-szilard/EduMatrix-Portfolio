@@ -286,6 +286,7 @@
         placeholder="Válasszon szerepkört"
         styleClass="w-full"
         [appendTo]="'body'"
+        [disabled]="isEditMode() && !canChangeRoleInDialog()"
         [class.ng-invalid]="isInvalid('role')"
         [class.ng-dirty]="isInvalid('role')"
       >
