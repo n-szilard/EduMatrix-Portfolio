@@ -1,0 +1,193 @@
+<p-toast position="top-right" />
+
+<div class="flex h-screen overflow-hidden">
+	<app-admin-sidebar [navLinks]="navLinks" />
+
+	<main class="flex-1 flex flex-column overflow-y-auto">
+		<app-admin-topbar title="Osztályok" [userName]="adminName()" userRoleLabel="Adminisztrátor" />
+
+		<!-- Page Body -->
+		<div class="flex flex-column gap-5 p-5">
+			<!-- Header -->
+			<div class="flex align-items-center justify-content-between flex-wrap gap-3">
+				<div>
+					<h2 class="text-color font-bold text-2xl m-0">Osztályok kezelése</h2>
+					<p class="text-color-secondary text-sm mt-1 mb-0">Osztályok létrehozása, szerkesztése és tanulók
+						hozzáadása.</p>
+				</div>
+				<p-button label="Új osztály" icon="pi pi-plus" (onClick)="openAddClassDialog()" />
+			</div>
+
+			<!-- Summary Cards -->
+			<div class="grid">
+				<div class="col-6 md:col-3">
+					<div
+						class="class-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+						<div class="class-icon flex align-items-center justify-content-center border-circle flex-shrink-0"
+							style="width: 50px; height: 50px; background: rgba(var(--primary-500), 0.1);">
+							<i class="pi pi-sitemap text-primary-500"></i>
+						</div>
+						<div>
+							<div class="text-color-secondary text-xs font-medium mb-1">Összes osztály</div>
+							<div class="text-color font-bold text-2xl">{{ classes().length }}</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 md:col-3">
+					<div
+						class="class-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+						<div class="class-icon flex align-items-center justify-content-center border-circle flex-shrink-0"
+							style="width: 50px; height: 50px; background: rgba(var(--primary-500), 0.1);">
+							<i class="pi pi-book text-primary-500"></i>
+						</div>
+						<div>
+							<div class="text-color-secondary text-xs font-medium mb-1">Összes tanuló</div>
+							<div class="text-color font-bold text-2xl">{{ totalStudents() }}</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-6 md:col-3">
+					<div
+						class="class-summary-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+						<div class="class-icon flex align-items-center justify-content-center border-circle flex-shrink-0"
+							style="width: 50px; height: 50px; background: rgba(var(--primary-500), 0.1);">
+							<i class="pi pi-book text-primary-500"></i>
+						</div>
+						<div>
+							<div class="text-color-secondary text-xs font-medium mb-1">Összes szabad tanuló</div>
+							<div class="text-color font-bold text-2xl">{{ totalFreeStudents() }}</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Classes Table -->
+			<div class="surface-card border-round-xl border-1 surface-border overflow-hidden">
+				<p-table [value]="classes()" responsiveLayout="scroll" [paginator]="true" [rows]="10"
+					[loading]="loading()">
+					<ng-template pTemplate="header">
+						<tr>
+							<th pSortableColumn="name">
+								Osztály <p-sortIcon field="name" />
+							</th>
+							<th pSortableColumn="grade">
+								Évfolyam <p-sortIcon field="grade" />
+							</th>
+							<th pSortableColumn="studentCount">
+								Tanulók <p-sortIcon field="studentCount" />
+							</th>
+							<th>Műveletek</th>
+						</tr>
+					</ng-template>
+					<ng-template pTemplate="body" let-class>
+						<tr>
+							<td>
+								<div class="flex align-items-center gap-2">
+									<i class="pi pi-sitemap text-primary-500"></i>
+									<span class="font-medium">{{ class.name }}</span>
+								</div>
+							</td>
+							<td>
+								<p-tag [value]="class.grade + '. évfolyam'" severity="info" />
+							</td>
+							<td>
+								<p-badge [value]="class.studentCount" severity="success" />
+							</td>
+							<td>
+								<div class="flex gap-2">
+									<p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+										pTooltip="Szerkesztés" (onClick)="openEditClassDialog(class)" />
+									<p-button icon="pi pi-users" [rounded]="true" [text]="true" severity="info"
+										pTooltip="Tanulók" (onClick)="openStudentsDialog(class)" />
+									<p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+										pTooltip="Törlés" (onClick)="deleteClass(class)" />
+								</div>
+							</td>
+						</tr>
+					</ng-template>
+				</p-table>
+			</div>
+		</div>
+	</main>
+</div>
+
+<!-- Add Class Dialog -->
+<p-dialog [visible]="displayAddClassDialog()" (visibleChange)="displayAddClassDialog.set($event)"
+	[header]="'Új osztály'" [modal]="true" [style]="{ width: '30rem' }"
+	[breakpoints]="{ '960px': '75vw', '640px': '90vw' }">
+	<div class="flex flex-column gap-4">
+		<div>
+			<label class="block text-color-secondary text-sm font-medium mb-2">Osztály neve</label>
+			<input type="text" pInputText class="w-full" placeholder="Pl: 9.A" [ngModel]="newClassName()"
+				(ngModelChange)="newClassName.set($event)" />
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<p-button label="Mégse" severity="secondary" (onClick)="displayAddClassDialog.set(false)" />
+		<p-button label="Mentés" (onClick)="saveClass()" />
+	</ng-template>
+</p-dialog>
+
+<!-- Edit Class Dialog -->
+<p-dialog [visible]="displayEditClassDialog()" (visibleChange)="displayEditClassDialog.set($event)"
+	[header]="'Osztály átnevezése'" [modal]="true" [style]="{ width: '30rem' }"
+	[breakpoints]="{ '960px': '75vw', '640px': '90vw' }">
+	<div class="flex flex-column gap-4">
+		<div>
+			<label class="block text-color-secondary text-sm font-medium mb-2">Új osztálynév</label>
+			<input type="text" pInputText class="w-full" placeholder="Pl: 9.A" [ngModel]="editedClassName()"
+				(ngModelChange)="editedClassName.set($event)" />
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<p-button label="Mégse" severity="secondary" (onClick)="displayEditClassDialog.set(false)" />
+		<p-button label="Mentés" (onClick)="saveEditedClass()" />
+	</ng-template>
+</p-dialog>
+
+<!-- Students Dialog -->
+<p-dialog [visible]="displayStudentsDialog()" (visibleChange)="displayStudentsDialog.set($event)"
+	[header]="'Tanulók - ' + (selectedClass()?.name || '')" [modal]="true" [style]="{ width: '42rem' }"
+	[breakpoints]="{ '960px': '75vw', '640px': '90vw' }">
+	<div class="flex flex-column gap-4">
+		<div>
+			<label class="block text-color-secondary text-sm font-medium mb-2">Szabad diák kiválasztása</label>
+			<p-dropdown class="w-full" styleClass="w-full" [options]="freeStudentOptions()"
+				[ngModel]="selectedFreeStudentId()" (ngModelChange)="selectedFreeStudentId.set($event)"
+				placeholder="-- Válassz diákot --" appendTo="body" />
+			<div *ngIf="freeStudentOptions().length === 0" class="text-color-secondary text-sm mt-2">
+				Nincs szabad diák.
+			</div>
+		</div>
+
+		<div class="flex justify-content-end">
+			<p-button label="Tanuló hozzáadása" icon="pi pi-plus" (onClick)="enrollSelectedStudent()" />
+		</div>
+
+		<p class="text-color-secondary m-0">Osztályba tartozó tanulók</p>
+
+		<div class="surface-card border-round-lg border-1 surface-border p-4">
+			<div *ngIf="classStudents().length === 0" class="text-center text-color-secondary">
+				<i class="pi pi-inbox"></i> Még nincsenek tanulók ebben az osztályban
+			</div>
+
+			<div *ngIf="classStudents().length > 0" class="flex flex-column gap-2">
+				<div *ngFor="let student of classStudents()"
+					class="flex align-items-center justify-content-between border-round-md surface-ground p-2">
+					<div class="text-sm">
+						<div><strong>Student:</strong> {{ student.id }}</div>
+						<div class="text-color-secondary"><strong>User:</strong> {{ student.user_id }}</div>
+					</div>
+					<p-button label="Eltávolítás" icon="pi pi-times" severity="danger" [text]="true"
+						(onClick)="removeStudent(student.id)" />
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<ng-template pTemplate="footer">
+		<p-button label="Bezárás" (onClick)="displayStudentsDialog.set(false)" />
+	</ng-template>
+</p-dialog>

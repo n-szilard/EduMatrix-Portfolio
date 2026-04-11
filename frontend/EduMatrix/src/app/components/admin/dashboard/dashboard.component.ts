@@ -86,7 +86,7 @@ export class DashboardComponent implements OnInit {
   navLinks = [
   { icon: 'pi pi-home', label: 'Vezérlőpult', routerLink: ['/admin/dashboard'] },
   { icon: 'pi pi-users', label: 'Felhasználók', routerLink: ['/admin/users'] },
-  // később: { icon: 'pi pi-book', label: 'Osztályok', routerLink: ['/admin/classes'] },
+  { icon: 'pi pi-sitemap', label: 'Osztályok', routerLink: ['/admin/classes'] },
   // később: { icon: 'pi pi-calendar', label: 'Órarend', routerLink: ['/admin/schedule'] },
   ];
 
