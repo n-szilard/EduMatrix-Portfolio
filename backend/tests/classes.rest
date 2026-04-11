@@ -1,0 +1,112 @@
+@url = http://localhost:4000/api
+
+###
+# @name loginAdmin
+POST {{url}}/users/login
+Content-Type: application/json
+
+{
+	"username": "admin",
+	"password": "admin"
+}
+
+@token = Bearer {{loginAdmin.response.body.$.token}}
+
+### Osztályok listázása
+# @name getAllClasses
+GET {{url}}/classes
+Authorization: {{token}}
+
+### Új osztály A 
+# @name createClassA
+POST {{url}}/classes
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+	"name": "10.A {{$timestamp}}"
+}
+
+### Új osztály B
+# @name createClassB
+POST {{url}}/classes
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+	"name": "10.B {{$timestamp}}"
+}
+
+### Get osztály A ID alapján
+GET {{url}}/classes/{{createClassA.response.body.$.id}}
+Authorization: {{token}}
+
+### Szabad diákok
+# @name getFreeStudents
+GET {{url}}/classes/students/free
+Authorization: {{token}}
+
+### Osztály diákjai (Class A)
+GET {{url}}/classes/{{createClassA.response.body.$.id}}/students
+Authorization: {{token}}
+
+### Diák hozzárendelése Class A-hoz (az első szabad)
+# @name enrollStudent1ToA
+POST {{url}}/classes/{{createClassA.response.body.$.id}}/enroll
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+	"student_id": "{{getFreeStudents.response.body.$[0].id}}"
+}
+
+### Diák áthelyezése Class A-ból B-be
+# @name moveStudentAtoB
+PUT {{url}}/classes/{{createClassB.response.body.$.id}}/enroll/{{getFreeStudents.response.body.$[0].id}}
+Authorization: {{token}}
+
+### Diák eltávolítása Class B-ből
+# @name removeStudentFromB
+DELETE {{url}}/classes/{{createClassB.response.body.$.id}}/enroll/{{getFreeStudents.response.body.$[0].id}}
+Authorization: {{token}}
+
+### Osztály A átnevezése
+# @name renameClassA
+PUT {{url}}/classes/{{createClassA.response.body.$.id}}
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+	"name": "Atnevezett 10.A {{$timestamp}}"
+}
+
+### Diák hozzárendelése Class A-hoz (másoodik szabad)
+# @name enrollStudent2ToA
+POST {{url}}/classes/{{createClassA.response.body.$.id}}/enroll
+Authorization: {{token}}
+Content-Type: application/json
+
+{
+	"student_id": "{{getFreeStudents.response.body.$[1].id}}"
+}
+
+### Osztály törlése (hiba - nem üres)
+# @name deleteClassAFail
+DELETE {{url}}/classes/{{createClassA.response.body.$.id}}
+Authorization: {{token}}
+
+### Diák eltávolítása Class A-ból
+# @name removeStudent2FromA
+DELETE {{url}}/classes/{{createClassA.response.body.$.id}}/enroll/{{getFreeStudents.response.body.$[1].id}}
+Authorization: {{token}}
+
+### Osztály A törlése (siker - üres)
+# @name deleteClassASuccess
+DELETE {{url}}/classes/{{createClassA.response.body.$.id}}
+Authorization: {{token}}
+
+### Osztály B törlése (siker - üres)
+# @name deleteClassBSuccess
+DELETE {{url}}/classes/{{createClassB.response.body.$.id}}
+Authorization: {{token}}
+

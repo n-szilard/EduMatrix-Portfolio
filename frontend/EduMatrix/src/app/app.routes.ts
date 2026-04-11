@@ -7,6 +7,7 @@ import { PendingComponent } from './components/system/pending/pending.component'
 import { DashboardComponent } from './components/admin/dashboard/dashboard.component';
 import { UsersComponent } from './components/admin/users/users.component';
 import { NotfoundComponent } from './components/system/notfound/notfound.component';
+import { ClassesComponent } from './components/admin/classes/classes.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -22,6 +23,7 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: DashboardComponent },
             { path: 'users', component: UsersComponent },
+            { path: 'classes', component: ClassesComponent },
         ],
     },
     { path: '**', component: NotfoundComponent },
