@@ -18,6 +18,7 @@ import { MessageService } from 'primeng/api';
 import { AdminSidebarComponent } from '../layout/admin-sidebar/admin-sidebar.component';
 import { AdminTopbarComponent } from '../layout/admin-topbar/admin-topbar.component';
 import { ClassService, ClassDto, StudentDto } from '../../../services/class.service';
+import { AuthService } from '../../../services/auth.service';
 
 export interface Class {
   id: string;
@@ -81,7 +82,8 @@ export class ClassesComponent implements OnInit {
 
   constructor(
     private messageService: MessageService,
-    private classService: ClassService
+    private classService: ClassService,
+    private authService: AuthService
   ) {
     this.loadAdminName();
   }
@@ -91,12 +93,9 @@ export class ClassesComponent implements OnInit {
   }
 
   loadAdminName() {
-    const userJson = localStorage.getItem('user');
-    if (userJson) {
-      try {
-        const user = JSON.parse(userJson);
-        this.adminName.set(user.full_name || user.username);
-      } catch {}
+    const user = this.authService.getUser();
+    if (user) {
+      this.adminName.set(user.full_name || user.username);
     }
   }
 
