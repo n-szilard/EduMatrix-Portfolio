@@ -30,6 +30,7 @@ import { InputIconModule } from 'primeng/inputicon';
 
 import { AdminSidebarComponent } from '../layout/admin-sidebar/admin-sidebar.component';
 import { AdminTopbarComponent } from '../layout/admin-topbar/admin-topbar.component';
+import { AuthService } from '../../../services/auth.service';
 
 export interface ActivityLog {
   icon: string;
@@ -164,7 +165,7 @@ export class DashboardComponent implements OnInit {
   // Minta adatsor (6 hónap) – a képen látható hullámzáshoz hasonló
   chartSampleData = [3.1, 3.35, 3.05, 3.3, 3.55, 3.2];
 
-  constructor() {
+  constructor(private authService: AuthService) {
     Chart.register(
       LineController,
       LineElement,
@@ -183,9 +184,8 @@ export class DashboardComponent implements OnInit {
 
   private loadAdminName(): void {
     try {
-      const userJson = localStorage.getItem('user');
-      if (userJson) {
-        const user = JSON.parse(userJson);
+      const user = this.authService.getUser();
+      if (user) {
         this.adminName.set(user.full_name || user.username || 'Admin');
       }
     } catch (error) {

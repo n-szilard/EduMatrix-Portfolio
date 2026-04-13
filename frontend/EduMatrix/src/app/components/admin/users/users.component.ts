@@ -34,6 +34,7 @@ import {
   CreateUserPayload,
   UpdateUserPayload,
 } from '../../../services/user.service';
+import { AuthService } from '../../../services/auth.service';
 
 // Modellek (a DB sémádhoz igazítva)
 
@@ -141,7 +142,8 @@ export class UsersComponent implements OnInit {
     private fb: FormBuilder,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
-  private userService: UserService,
+    private userService: UserService,
+    private authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -152,9 +154,8 @@ export class UsersComponent implements OnInit {
 
   private loadAdminName(): void {
     try {
-      const userJson = localStorage.getItem('user');
-      if (userJson) {
-        const user = JSON.parse(userJson);
+      const user = this.authService.getUser();
+      if (user) {
         this.adminName.set(user.full_name || user.username || 'Admin');
       }
     } catch (error) {

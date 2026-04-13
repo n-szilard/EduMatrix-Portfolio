@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { AuthService } from '../../../services/auth.service';
 
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
@@ -19,7 +19,6 @@ import { MessageModule } from 'primeng/message';
     CommonModule,
     ReactiveFormsModule,
     RouterModule,
-    HttpClientModule,
     InputTextModule,
     PasswordModule,
     CheckboxModule,
@@ -40,7 +39,7 @@ export class RegisterComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private http: HttpClient,
+    private authService: AuthService,
     private router: Router
   ) { }
 
@@ -81,15 +80,11 @@ export class RegisterComponent implements OnInit {
     this.errorMessage = '';
     this.successMessage = '';
 
-    const { firstName, lastName, email, username, password, role } = this.registerForm.value;
+    const { firstName, lastName, email, username, password } = this.registerForm.value;
 
-    this.http.post<any>('http://localhost:4000/api/users/register', {
-      firstName, lastName, email, username, password, role
-    }).subscribe({
+    this.authService.register(firstName, lastName, email, username, password).subscribe({
       next: (res) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('user', JSON.stringify(res.user));
-        this.successMessage = 'Sikeres regisztráció! Átirányítás...';
+        this.successMessage = res?.message || 'Sikeres regisztráció! Fiókod jóváhagyásra vár.';
         setTimeout(() => this.router.navigate(['/login']), 1500);
       },
       error: (err) => {
