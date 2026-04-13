@@ -9,6 +9,7 @@ import { UsersComponent } from './components/admin/users/users.component';
 import { NotfoundComponent } from './components/system/notfound/notfound.component';
 import { ClassesComponent } from './components/admin/classes/classes.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
+import { ProfileComponent } from './components/user/profile/profile.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -16,6 +17,8 @@ export const routes: Routes = [
     { path: 'logout', component: LogoutComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'pending', component: PendingComponent, canActivate: [authGuard] },
+    { path: 'profile', component: ProfileComponent },
+
     {
         path: 'admin',
         canActivate: [roleGuard(['admin'])],
