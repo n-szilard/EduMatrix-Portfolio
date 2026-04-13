@@ -1,0 +1,127 @@
+<p-toast position="bottom-center"></p-toast>
+
+<div class="profile-page">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="flex align-items-center gap-2">
+      <div class="logo-icon">
+        <i class="pi pi-graduation-cap"></i>
+      </div>
+      <span class="logo-text">Edu<span class="text-primary">Matrix</span></span>
+    </div>
+
+    <div class="flex align-items-center gap-3">
+      <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary" />
+      <p-divider layout="vertical" styleClass="mx-1" />
+      <div class="flex align-items-center gap-2">
+        <div class="user-info">
+          <span>Tung Tung Sahur</span>
+          <small>Rendszergazda</small>
+        </div>
+        <p-avatar label="TTS" shape="circle" styleClass="nav-avatar" />
+      </div>
+    </div>
+  </nav>
+
+  <!-- FŐ TARTALOM -->
+  <div class="content">
+
+    <!-- Profil fejléc -->
+    <div class="profile-header">
+      <div class="avatar-wrap">
+        <p-avatar label="TTS" shape="circle" styleClass="big-avatar" />
+       
+      </div>
+      <div>
+        <h1>Tung Tung Sahur</h1>
+        <p>Főadminisztrátor • EduMatrix Intézmény</p>
+        <div class="flex gap-2 mt-2">
+          <p-tag value="AKTÍV FIÓK" severity="success" [rounded]="true" />
+          <p-tag value="Utolsó belépés: Ma 08:42" [rounded]="true" styleClass="last-login-tag" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Formok -->
+    <div class="grid">
+
+      <!-- Személyes adatok -->
+      <div class="col-12 lg:col-6">
+        <div class="card">
+          <div class="card-head">
+            <i class="pi pi-id-card text-primary"></i>
+            <span>Személyes adatok</span>
+          </div>
+          <div class="card-body">
+            <div class="grid">
+              <div class="col-6">
+                <label>Vezetéknév</label>
+                <input pInputText [(ngModel)]="vezeteknev" class="w-full" />
+              </div>
+              <div class="col-6">
+                <label>Keresztnév</label>
+                <input pInputText [(ngModel)]="keresztnev" class="w-full" />
+              </div>
+            </div>
+            <div class="mt-3">
+              <label>Email cím</label>
+              <input pInputText type="email" [(ngModel)]="email" class="w-full" />
+            </div>
+            <div class="mt-3">
+              <label>Telefonszám</label>
+              <input pInputText type="tel" [(ngModel)]="telefon" class="w-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Jelszó módosítása -->
+      <div class="col-12 lg:col-6">
+        <div class="card">
+          <div class="card-head">
+            <i class="pi pi-lock text-primary"></i>
+            <span>Jelszó módosítása</span>
+          </div>
+          <div class="card-body">
+            <div>
+              <label>Jelenlegi jelszó</label>
+              <p-password [(ngModel)]="jelenlegiJelszo" [feedback]="false" [toggleMask]="true"
+                styleClass="w-full" inputStyleClass="w-full" />
+            </div>
+            <div class="mt-3">
+              <label>Új jelszó</label>
+              <p-password [(ngModel)]="ujJelszo" [toggleMask]="true"
+                styleClass="w-full" inputStyleClass="w-full"/>
+              <small>Legalább 8 karakter, tartalmazzon számot és nagybetűt.</small>
+            </div>
+            <div class="mt-3">
+              <label>Új jelszó megerősítése</label>
+              <p-password [(ngModel)]="ujJelszoMegerosites" [feedback]="false" [toggleMask]="true"
+                styleClass="w-full" inputStyleClass="w-full"/>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Gombok -->
+    <div class="actions">
+      <p-button label="Mégse" severity="secondary" [outlined]="true" (click)="megse()" />
+      <p-button label="Változtatások mentése" icon="pi pi-save" (click)="mentesek()" />
+    </div>
+
+  </div>
+
+  <!-- LÁBLÉC -->
+  <footer>
+    <p>© 2024 EduMatrix Iskolai Adminisztrációs Rendszer v2.4.1</p>
+    <div class="footer-links">
+      <a href="#">Adatvédelmi tájékoztató</a>
+      <a href="#">Súgó központ</a>
+      <a href="#">Kapcsolat</a>
+    </div>
+  </footer>
+
+</div>
