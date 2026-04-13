@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-logout',
@@ -9,12 +10,11 @@ import { Router } from '@angular/router';
 })
 export class LogoutComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
   ngOnInit(): void {
-    // localStorage-ből törlés
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    // Kijelentkeztetés központi AuthService-en keresztül
+    this.authService.logout();
 
     // Átirányítás az főoldalra
     this.router.navigate(['/']);
