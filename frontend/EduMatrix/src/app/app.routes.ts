@@ -10,6 +10,7 @@ import { NotfoundComponent } from './components/system/notfound/notfound.compone
 import { ClassesComponent } from './components/admin/classes/classes.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
+import { StudentDashboardComponent } from './components/student/student-dashboard/student-dashboard.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -27,6 +28,14 @@ export const routes: Routes = [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'users', component: UsersComponent },
             { path: 'classes', component: ClassesComponent },
+        ],
+    },
+    {
+        path: 'student',
+        canActivate: [roleGuard(['student', 'admin'])],
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+            { path: 'dashboard', component: StudentDashboardComponent },
         ],
     },
     { path: '**', component: NotfoundComponent },
