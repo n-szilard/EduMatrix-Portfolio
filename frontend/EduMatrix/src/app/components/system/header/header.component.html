@@ -16,8 +16,15 @@
     </ul>
 
     <div class="nav-actions" [class.open]="menuOpen">
-      <a routerLink="/login" class="btn-ghost">Bejelentkezés</a>
-      <a routerLink="/register" class="btn-primary">Regisztráció</a>
+      @if (!isAuthenticated()) {
+        <a routerLink="/login" class="btn-ghost">Bejelentkezés</a>
+        <a routerLink="/register" class="btn-primary">Regisztráció</a>
+      } @else {
+        <a href="javascript:void(0)" class="btn-primary" role="button" (click)="goToRoleHome()">
+          Ugrás a felületre
+        </a>
+        <a routerLink="/logout" class="btn-ghost">Kijelentkezés</a>
+      }
     </div>
 
     <button class="hamburger" (click)="toggleMenu()" [class.active]="menuOpen">
