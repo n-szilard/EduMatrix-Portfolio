@@ -39,6 +39,11 @@ export interface ActivatePendingPayload {
   class_id?: string | null;
 }
 
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -92,6 +97,14 @@ export class UserService {
   {
     return this.http.put<{ message: string; userId: string; role: string }>(
       `${this.apiBaseUrl}/users/${encodeURIComponent(userId)}/activate`,
+      payload,
+      { headers: this.authHeaders() }
+    );
+  }
+
+  changePassword(payload: ChangePasswordPayload): Observable<{ message: string }> {
+    return this.http.put<{ message: string }>(
+      `${this.apiBaseUrl}/users/me/password`,
       payload,
       { headers: this.authHeaders() }
     );
