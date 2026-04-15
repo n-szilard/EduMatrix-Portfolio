@@ -1,0 +1,156 @@
+@baseUrl = http://localhost:4000/api
+
+### 1) Admin login (token kell a create/patch/delete műveletekhez)
+# @name loginAdmin
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+	"username": "admin",
+	"password": "adminpass"
+}
+
+### 2) Kiegészítő adatok lekérése (kell egy class_subject_id)
+# Megjegyzés: ehhez kell legalább 1 létező Class, Subject és Teacher a DB-ben.
+
+### 2/a Osztályok listázása (kell egy class_id)
+# @name getClasses
+GET {{baseUrl}}/classes
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 2/b Tantárgyak listázása (kell egy subject_id)
+# @name getSubjects
+GET {{baseUrl}}/subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 2/c Tanárok listázása (kell egy teacher_id)
+# Megjegyzés: ha nálad más endpoint, írd át.
+# @name getTeachers
+GET {{baseUrl}}/users/teachers
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 2/d Egy-egy ID kiválasztása az első elemből
+@classId = {{getClasses.response.body.$[0].id}}
+@subjectId = {{getSubjects.response.body.$[0].id}}
+@teacherId = {{getTeachers.response.body.$[0].id}}
+
+### 2/e ClassSubject létrehozása kifejezetten a Timetable tesztekhez
+# @name createClassSubjectForTimetable
+POST {{baseUrl}}/class-subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_id": "{{classId}}",
+	"subject_id": "{{subjectId}}",
+	"teacher_id": "{{teacherId}}"
+}
+
+
+### 3) Órarend listázása (üresen is lehet)
+# Elvárt: 200 + tömb
+# @name listTimetables
+GET {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 4) Új órarend bejegyzés létrehozása
+# Elvárt: 201 + rekord
+# @name createTimetable
+POST {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_subject_id": "{{createClassSubjectForTimetable.response.body.$.id}}",
+	"day_of_week": "Monday",
+	"lesson_number": 0
+}
+
+
+### 5) Duplikáció teszt - ugyanaz a class_subject_id + nap + óraszám
+# Elvárt: 409
+POST {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_subject_id": "{{createClassSubjectForTimetable.response.body.$.id}}",
+	"day_of_week": "Monday",
+	"lesson_number": 0
+}
+
+### 6) Órarend bejegyzés lekérése id alapján
+# Elvárt: 200
+GET {{baseUrl}}/timetables/{{createTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 7) Szűrés teszt: class_subject_id alapján
+# Elvárt: 200 + tömb (benne legalább ez a bejegyzés)
+GET {{baseUrl}}/timetables?class_subject_id={{createClassSubjectForTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 8) Szűrés teszt: nap + óraszám alapján
+GET {{baseUrl}}/timetables?day_of_week=Monday&lesson_number=0
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 9) Módosítás (PATCH) - óraszám 2-re
+# Elvárt: 200
+# @name patchTimetable
+PATCH {{baseUrl}}/timetables/{{createTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"lesson_number": 1
+}
+
+### 10) Negatív teszt: érvénytelen nap
+# Elvárt: 400
+POST {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_subject_id": "{{classSubjectId}}",
+	"day_of_week": "Hétfő",
+	"lesson_number": 3
+}
+
+### 10/b Negatív teszt: érvénytelen óraszám (-1)
+# Elvárt: 400
+POST {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_subject_id": "{{classSubjectId}}",
+	"day_of_week": "Tuesday",
+	"lesson_number": -1
+}
+
+### 11) Negatív teszt: nem létező class_subject_id
+# Elvárt: 400
+POST {{baseUrl}}/timetables
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+	"class_subject_id": "00000000-0000-0000-0000-000000000000",
+	"day_of_week": "Tuesday",
+	"lesson_number": 3
+}
+
+### 12) Törlés
+# Elvárt: 204
+DELETE {{baseUrl}}/timetables/{{createTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 13) Ellenőrzés: törölt bejegyzés lekérése
+# Elvárt: 404
+GET {{baseUrl}}/timetables/{{createTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 14) Takarítás: a teszthez létrehozott ClassSubject törlése
+# Elvárt: 204 (ha nincs rá hivatkozó órarend/jegy/hiányzás)
+DELETE {{baseUrl}}/class-subjects/{{createClassSubjectForTimetable.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
