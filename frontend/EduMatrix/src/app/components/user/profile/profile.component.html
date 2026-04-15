@@ -16,8 +16,8 @@
       <p-divider layout="vertical" styleClass="mx-1" />
       <div class="flex align-items-center gap-2">
         <div class="user-info">
-          <span>Tung Tung Sahur</span>
-          <small>Rendszergazda</small>
+          <span>{{ vezeteknev }} {{ keresztnev }}</span>
+          <small>{{ role }}</small>
         </div>
         <p-avatar label="TTS" shape="circle" styleClass="nav-avatar" />
       </div>
@@ -34,8 +34,8 @@
        
       </div>
       <div>
-        <h1>Tung Tung Sahur</h1>
-        <p>Főadminisztrátor • EduMatrix Intézmény</p>
+  <h1>{{ vezeteknev }} {{ keresztnev }}</h1>
+  <p>{{ role }} • EduMatrix Intézmény</p>
         <div class="flex gap-2 mt-2">
           <p-tag value="AKTÍV FIÓK" severity="success" [rounded]="true" />
           <p-tag value="Utolsó belépés: Ma 08:42" [rounded]="true" styleClass="last-login-tag" />
@@ -69,8 +69,8 @@
               <input pInputText type="email" [(ngModel)]="email" class="w-full" />
             </div>
             <div class="mt-3">
-              <label>Telefonszám</label>
-              <input pInputText type="tel" [(ngModel)]="telefon" class="w-full" />
+              <label>Username</label>
+              <input pInputText type="text" [(ngModel)]="username" class="w-full" />
             </div>
           </div>
         </div>
@@ -86,19 +86,44 @@
           <div class="card-body">
             <div>
               <label>Jelenlegi jelszó</label>
-              <p-password [(ngModel)]="jelenlegiJelszo" [feedback]="false" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full" />
+              <p-password
+                [(ngModel)]="jelenlegiJelszo"
+                [feedback]="false"
+                [toggleMask]="true"
+                styleClass="w-full"
+                inputStyleClass="w-full" />
             </div>
+
             <div class="mt-3">
               <label>Új jelszó</label>
-              <p-password [(ngModel)]="ujJelszo" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full"/>
-              <small>Legalább 8 karakter, tartalmazzon számot és nagybetűt.</small>
+              <p-password
+                [(ngModel)]="ujJelszo"
+                [toggleMask]="true"
+                styleClass="w-full"
+                inputStyleClass="w-full" />
+              <small class="block mt-1" [class.text-red-400]="passwordTooShort">
+                Legalább 8 karakter.
+              </small>
             </div>
+
             <div class="mt-3">
               <label>Új jelszó megerősítése</label>
-              <p-password [(ngModel)]="ujJelszoMegerosites" [feedback]="false" [toggleMask]="true"
-                styleClass="w-full" inputStyleClass="w-full"/>
+              <p-password
+                [(ngModel)]="ujJelszoMegerosites"
+                [feedback]="false"
+                [toggleMask]="true"
+                styleClass="w-full"
+                inputStyleClass="w-full" />
+              <small class="block mt-1 text-red-400" *ngIf="passwordMismatch">
+                A két jelszó nem egyezik.
+              </small>
+            </div>
+
+            <div class="flex justify-content-end mt-4">
+              <p-button
+                label="Jelszó módosítása"
+                icon="pi pi-check"
+                (click)="jelszoModositas()" />
             </div>
           </div>
         </div>
