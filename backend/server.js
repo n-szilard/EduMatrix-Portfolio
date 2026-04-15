@@ -12,6 +12,7 @@ app.use(express.json());
 // Routes
 app.use('/api/users', require('./routes/users.routes'));
 app.use('/api/classes', require('./routes/classes.routes'));
+app.use('/api/grades', require('./routes/grades.routes'));
 app.use('/api/subjects', require('./routes/subjects.routes'));
 app.use('/api/class-subjects', require('./routes/class-subjects.routes'));
 app.use('/api/timetables', require('./routes/timetables.routes'));
