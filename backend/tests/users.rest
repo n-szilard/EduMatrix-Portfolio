@@ -7,7 +7,7 @@ Content-Type: application/json
 
 {
   "username": "admin",
-  "password": "admin"
+  "password": "adminpass"
 }
 
 ### 2) Új felhasználó regisztráció
@@ -44,7 +44,7 @@ Content-Type: application/json
   "email": "admin.created+{{$timestamp}}@example.com",
   "full_name": "Admin Altal Letrehozott",
   "password": "Er0sJelszo123",
-  "role": "teacher"
+  "role": "pending"
 }
 
 ###
@@ -74,7 +74,7 @@ Authorization: Bearer {{loginAdmin.response.body.$.token}}
 # role: student vagy teacher
 # class_id csak student esetén kell
 # pendingUserId: töltsd ki egy pending user id-ra
-@pendingUserId = e8e772ab-6a95-4f40-bfe6-d65cb5ae709e
+@pendingUserId = 47d23171-93d5-4f8e-a197-5d20506b9282
 
 # @name activatePendingUser
 PUT {{url}}/users/{{pendingUserId}}/activate
