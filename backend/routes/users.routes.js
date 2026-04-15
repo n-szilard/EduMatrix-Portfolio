@@ -336,6 +336,53 @@ router.delete('/:id', authenticateToken, authorizeRoles('admin'), async (req, re
   }
 });
 
+/**
+ * Saját jelszó módosítása (bejelentkezett user)
+ * PUT /api/users/me/password
+ * body: { currentPassword: string, newPassword: string }
+ */
+router.put(
+  '/me/password',
+  authenticateToken,
+  [
+    body('currentPassword').notEmpty().withMessage('Jelenlegi jelszó megadása kötelező.'),
+    body('newPassword').isLength({ min: 8 }).withMessage('Az új jelszónak legalább 8 karakter hosszúnak kell lennie.'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Nincs bejelentkezett felhasználó.' });
+      }
+
+      const { currentPassword, newPassword } = req.body;
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'Felhasználó nem található.' });
+      }
+
+      const isMatch = await bcrypt.compare(currentPassword, user.password_hash);
+      if (!isMatch) {
+        return res.status(400).json({ message: 'A jelenlegi jelszó hibás.' });
+      }
+
+      const salt = await bcrypt.genSalt(10);
+      user.password_hash = await bcrypt.hash(newPassword, salt);
+      await user.save();
+
+      return res.json({ message: 'Jelszó sikeresen módosítva.' });
+    } catch (error) {
+      console.error('Change password hiba:', error.message);
+      return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
+    }
+  }
+);
+
 // GET /api/users/roles
 router.get('/roles', async (req, res) => {
   try {

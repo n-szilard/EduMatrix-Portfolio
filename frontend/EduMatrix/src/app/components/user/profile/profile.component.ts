@@ -9,6 +9,8 @@ import { TagModule } from 'primeng/tag';
 import { AvatarModule } from 'primeng/avatar';
 import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
+import { AuthService } from '../../../services/auth.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -17,7 +19,7 @@ import { MessageService } from 'primeng/api';
     CommonModule,
     FormsModule,
     InputTextModule,
-    PasswordModule,
+  PasswordModule,
     ButtonModule,
     ToastModule,
     TagModule,
@@ -29,16 +31,51 @@ import { MessageService } from 'primeng/api';
   styleUrl: './profile.component.scss',
 })
 export class ProfileComponent {
-  vezeteknev = 'Tung';
-  keresztnev = 'Sahur';
-  email = 'tung.tung.sahur@edumatrix.hu';
-  telefon = '+36 30 123 4567';
+  // Profil oldal
+  constructor(
+    private messageService: MessageService,
+    private authService: AuthService,
+    private userService: UserService
+  ) {
+    // User betöltés
+    const user = this.authService.getUser();
+
+    this.email = user?.email ?? '';
+    this.username = user?.username ?? '';
+
+    // Név bontás
+    const fullName = user?.full_name ?? '';
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    this.vezeteknev = parts[0] ?? '';
+    this.keresztnev = parts.slice(1).join(' ') ?? '';
+
+    this.role = this.authService.getRole() ?? '';
+  }
+
+  // Profil mezők
+  vezeteknev = '';
+  keresztnev = '';
+  email = '';
+  username = '';
+  role = '';
 
   jelenlegiJelszo = '';
   ujJelszo = '';
   ujJelszoMegerosites = '';
 
-  constructor(private messageService: MessageService) {}
+  get passwordMismatch(): boolean {
+    return Boolean(this.ujJelszo && this.ujJelszoMegerosites && this.ujJelszo !== this.ujJelszoMegerosites);
+  }
+
+  get passwordTooShort(): boolean {
+    return Boolean(this.ujJelszo && this.ujJelszo.length < 8);
+  }
+
+  private resetPasswordForm(): void {
+    this.jelenlegiJelszo = '';
+    this.ujJelszo = '';
+    this.ujJelszoMegerosites = '';
+  }
 
   mentesek(): void {
     this.messageService.add({
@@ -49,13 +86,78 @@ export class ProfileComponent {
     });
   }
 
+  jelszoModositas(): void {
+    if (!this.jelenlegiJelszo || !this.ujJelszo || !this.ujJelszoMegerosites) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Hiányzó adatok',
+        detail: 'Töltsd ki az összes jelszó mezőt.',
+        life: 3000,
+      });
+      return;
+    }
+
+    if (this.passwordTooShort) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Gyenge jelszó',
+        detail: 'Az új jelszónak legalább 8 karakter hosszúnak kell lennie.',
+        life: 3500,
+      });
+      return;
+    }
+
+    if (this.passwordMismatch) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Nem egyezik',
+        detail: 'Az új jelszó és a megerősítés nem egyezik.',
+        life: 3500,
+      });
+      return;
+    }
+
+  // API
+    this.userService.changePassword({
+      currentPassword: this.jelenlegiJelszo,
+      newPassword: this.ujJelszo,
+    }).subscribe({
+      next: (res) => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Siker',
+          detail: res?.message || 'Jelszó sikeresen módosítva.',
+          life: 3000,
+        });
+        this.resetPasswordForm();
+      },
+      error: (err) => {
+  // Backend hiba
+        const msg = err?.error?.message
+          || (Array.isArray(err?.error?.errors) ? err.error.errors.map((e: any) => e.msg).join(' ') : null)
+          || 'Nem sikerült módosítani a jelszót.';
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hiba',
+          detail: msg,
+          life: 4000,
+        });
+      }
+    });
+  }
+
   megse(): void {
-    this.vezeteknev = 'Tung';
-    this.keresztnev = 'Sahur';
-    this.email = 'tung.tung.sahur@edumatrix.hu';
-    this.telefon = '+36 30 123 4567';
-    this.jelenlegiJelszo = '';
-    this.ujJelszo = '';
-    this.ujJelszoMegerosites = '';
+    const user = this.authService.getUser();
+    this.email = user?.email ?? '';
+    this.username = user?.username ?? '';
+
+    const fullName = user?.full_name ?? '';
+    const parts = fullName.trim().split(/\s+/).filter(Boolean);
+    this.vezeteknev = parts[0] ?? '';
+    this.keresztnev = parts.slice(1).join(' ') ?? '';
+
+    this.role = this.authService.getRole() ?? '';
+
+    this.resetPasswordForm();
   }
 }
