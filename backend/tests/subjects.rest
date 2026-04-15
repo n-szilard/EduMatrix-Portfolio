@@ -1,0 +1,75 @@
+@url = http://localhost:4000/api
+
+### Admin login (token kell az admin műveletekhez)
+# @name loginAdmin
+POST {{url}}/users/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "adminpass"
+}
+
+### Összes tantárgy lekérése (auth kell)
+# @name getSubjects
+GET {{url}}/subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### Új tantárgy létrehozása (admin)
+# @name createSubject
+POST {{url}}/subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Matematika {{$timestamp}}"
+}
+
+### Tantárgy id eltárolása a továbbiakhoz
+@subjectId = {{createSubject.response.body.$.id}}
+
+### Tantárgy lekérése id alapján (ha nincs ilyen endpointod, ezt hagyd ki)
+# Megjegyzés: a jelenlegi subjects.routes.js-ben nincs GET /:id
+# @name getSubjectById
+GET {{url}}/subjects/{{subjectId}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### Tantárgy módosítása (admin)
+# @name updateSubject
+PATCH {{url}}/subjects/{{subjectId}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Matematika (módosítva) {{$timestamp}}"
+}
+
+### Tantárgy törlése (admin) - akkor sikerül, ha nincs ClassSubject hivatkozás
+# @name deleteSubject
+DELETE {{url}}/subjects/{{subjectId}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### Negatív teszt: hibás create (üres név)
+# @name createSubjectInvalid
+POST {{url}}/subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "   "
+}
+
+### Negatív teszt: nem létező módosítás
+# @name updateSubjectNotFound
+PATCH {{url}}/subjects/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "name": "Nincs ilyen"
+}
+
+### Negatív teszt: nem létező törlés
+# @name deleteSubjectNotFound
+DELETE {{url}}/subjects/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
