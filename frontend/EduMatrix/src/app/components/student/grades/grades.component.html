@@ -1,0 +1,55 @@
+<div class="grades-page p-4">
+
+  <div class="flex align-items-center gap-3 mb-4">
+    <i class="pi pi-book text-2xl text-primary"></i>
+    <div>
+      <h2 class="m-0 text-2xl font-bold">Jegyeim</h2>
+  <p class="m-0 text-500 text-sm">{{ className || 'Osztályom' }} – Jegyek</p>
+    </div>
+  </div>
+
+  <div class="flex flex-column gap-3">
+    @for (subject of subjects; track subject.name) {
+      <p-card styleClass="subject-card">
+
+        <!-- Fejléc -->
+        <ng-template pTemplate="header">
+          <div class="flex align-items-center justify-content-between px-4 pt-3 pb-2">
+            <div>
+              <span class="font-bold text-lg">{{ subject.name }}</span>
+            </div>
+            <p-tag
+              [value]="getAverage(subject.grades).toFixed(2)"
+              [severity]="avgColor(getAverage(subject.grades))"
+              styleClass="text-sm font-bold px-3"
+              pTooltip="Félév átlaga"
+            />
+          </div>
+          <p-divider styleClass="m-0" />
+        </ng-template>
+
+        <!-- Hónapok -->
+        <div class="flex flex-wrap gap-4 pt-1">
+          @for (month of getMonths(subject.grades); track month) {
+            <div class="month-block">
+              <p class="month-label">{{ month }}</p>
+              <div class="flex flex-wrap gap-2">
+                @for (grade of getByMonth(subject.grades, month); track grade.isoDate) {
+                  <div
+                    class="grade-chip grade-{{ grade.value }}"
+                    [pTooltip]="grade.dateLabel"
+                    tooltipPosition="top"
+                  >
+                    {{ grade.value }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+
+      </p-card>
+    }
+  </div>
+
+</div>

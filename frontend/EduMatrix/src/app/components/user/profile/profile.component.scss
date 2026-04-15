@@ -1,14 +1,14 @@
 $primary: #137fec;
-$bg: #101922;
+$bg: #1c1b22; // home gradient alap
 $border: rgba(19, 127, 236, 0.15);
-$card-bg: rgba(15, 23, 42, 0.5);
+$card-bg: rgba(28, 27, 34, 0.82);
 $text: #f1f5f9;
 $muted: #94a3b8;
 
 :host { display: block; }
 
 .profile-page {
-  background-color: $bg;
+  background: var(--surface-ground);
   color: $text;
   min-height: 100vh;
 }
@@ -19,9 +19,8 @@ $muted: #94a3b8;
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background-color: rgba(16, 25, 34, 0.9);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid $border;
+  background-color: var(--surface-card);
+  border-bottom: 1px solid var(--surface-border);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -68,8 +67,8 @@ $muted: #94a3b8;
   align-items: center;
   gap: 28px;
   padding: 28px;
-  background-color: $card-bg;
-  border: 1px solid $border;
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-border);
   border-radius: 12px;
 
   h1 { font-size: 1.75rem; font-weight: 700; margin: 0 0 4px; }
@@ -84,8 +83,8 @@ $muted: #94a3b8;
 
 // Kártyák
 .card {
-  background-color: $card-bg;
-  border: 1px solid $border;
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-border);
   border-radius: 12px;
   overflow: hidden;
   height: 100%;
@@ -96,8 +95,8 @@ $muted: #94a3b8;
   align-items: center;
   gap: 8px;
   padding: 14px 20px;
-  border-bottom: 1px solid $border;
-  background-color: rgba($primary, 0.05);
+  border-bottom: 1px solid var(--surface-border);
+  background-color: var(--surface-0);
   font-weight: 600;
 }
 
@@ -128,7 +127,7 @@ $muted: #94a3b8;
   justify-content: flex-end;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--surface-border);
 }
 
 // Lábléc
@@ -137,7 +136,7 @@ footer {
   padding: 32px;
   color: $muted;
   font-size: 0.85rem;
-  border-top: 1px solid $border;
+  border-top: 1px solid var(--surface-border);
 
   p { margin: 0 0 8px; }
 }
@@ -150,9 +149,8 @@ footer {
   a:hover { color: $primary; }
 }
 
-// PrimeNG sötét téma override-ok
+// PrimeNG
 :host ::ng-deep {
-
   .big-avatar {
     width: 6.5rem !important;
     height: 6.5rem !important;
@@ -169,37 +167,5 @@ footer {
     background-color: rgba($primary, 0.15) !important;
     color: $primary !important;
     border: 1px solid rgba($primary, 0.3) !important;
-  }
-
-  .p-inputtext {
-    background-color: $bg !important;
-    border-color: $border !important;
-    color: $text !important;
-    border-radius: 8px;
-    &:enabled:focus {
-      border-color: $primary !important;
-      box-shadow: 0 0 0 2px rgba($primary, 0.2) !important;
-    }
-  }
-
-  .p-divider-vertical { border-left: 1px solid $border !important; }
-
-  .p-button:not(.p-button-outlined):not(.p-button-text) {
-    background-color: $primary !important;
-    border-color: $primary !important;
-  }
-
-  .p-button.p-button-outlined {
-    color: #cbd5e1 !important;
-    border-color: $border !important;
-  }
-
-  .p-toast .p-toast-message.p-toast-message-success {
-    background-color: #1a2535 !important;
-    border: 1px solid rgba($primary, 0.4) !important;
-    color: $text !important;
-    .p-toast-message-icon,
-    .p-toast-summary,
-    .p-toast-detail { color: $text !important; }
   }
 }
