@@ -1,0 +1,123 @@
+.grades-page {
+  --bg: #0b1220;
+  --panel: rgba(255, 255, 255, 0.05);
+  --panel2: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.08);
+  --text: rgba(255, 255, 255, 0.92);
+  --muted: rgba(255, 255, 255, 0.65);
+  --chip-text: rgba(255, 255, 255, 0.95);
+
+  min-height: calc(100vh - 80px);
+  color: var(--text);
+  background:
+    radial-gradient(1200px 600px at 30% -10%, rgba(99, 102, 241, 0.25), transparent 60%),
+    radial-gradient(900px 500px at 90% 10%, rgba(14, 165, 233, 0.18), transparent 55%),
+    radial-gradient(900px 600px at 20% 80%, rgba(34, 197, 94, 0.12), transparent 60%),
+    linear-gradient(180deg, #080d18 0%, var(--bg) 100%);
+
+  h2 {
+    color: var(--text);
+    letter-spacing: .2px;
+  }
+
+  .text-500 {
+    color: var(--muted) !important;
+  }
+}
+
+/* PrimeNG Card – reset + üveg hatás */
+:host ::ng-deep .subject-card.p-card {
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--panel) 0%, rgba(255, 255, 255, 0.03) 100%);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .35);
+  overflow: hidden;
+}
+
+:host ::ng-deep .subject-card.p-card .p-card-body {
+  padding: 0.75rem 1rem 1rem;
+}
+
+:host ::ng-deep .subject-card.p-card .p-card-content {
+  padding-top: .75rem;
+}
+
+/* Header sáv */
+:host ::ng-deep .subject-card.p-card .p-card-header {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+}
+
+:host ::ng-deep .subject-card .p-divider.p-divider-horizontal {
+  margin: 0;
+}
+
+/* Hónap blokkok – táblázatos érzet */
+.month-block {
+  min-width: 112px;
+  padding: .65rem .75rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.month-label {
+  font-size: .7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .09em;
+  color: var(--muted);
+  margin: 0 0 .55rem;
+}
+
+/* Jegy chip – Kréta-szerű négyzet */
+.grade-chip {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1.05rem;
+  cursor: default;
+  user-select: none;
+  color: var(--chip-text);
+
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  transition: transform .12s ease, filter .12s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+  }
+
+  &.grade-5 {
+    background: linear-gradient(180deg, rgba(34, 197, 94, .95), rgba(22, 163, 74, .95));
+  }
+  &.grade-4 {
+    background: linear-gradient(180deg, rgba(59, 130, 246, .95), rgba(37, 99, 235, .95));
+  }
+  &.grade-3 {
+    background: linear-gradient(180deg, rgba(245, 158, 11, .95), rgba(217, 119, 6, .95));
+  }
+  &.grade-2 {
+    background: linear-gradient(180deg, rgba(249, 115, 22, .95), rgba(234, 88, 12, .95));
+  }
+  &.grade-1 {
+    background: linear-gradient(180deg, rgba(239, 68, 68, .95), rgba(220, 38, 38, .95));
+  }
+}
+
+/* p-tag finomhangolás sötét háttéren */
+:host ::ng-deep .p-tag {
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+/* Mobil: hónap blokkok tördelése */
+@media (max-width: 768px) {
+  .month-block {
+    min-width: 100%;
+  }
+}

@@ -11,6 +11,7 @@ import { ClassesComponent } from './components/admin/classes/classes.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { StudentDashboardComponent } from './components/student/student-dashboard/student-dashboard.component';
+import { GradesComponent } from './components/student/grades/grades.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -19,6 +20,8 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent },
     { path: 'pending', component: PendingComponent, canActivate: [authGuard] },
     { path: 'profile', component: ProfileComponent },
+    
+
 
     {
         path: 'admin',
@@ -36,6 +39,7 @@ export const routes: Routes = [
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
+            { path: 'grades', component: GradesComponent },
         ],
     },
     { path: '**', component: NotfoundComponent },
