@@ -13,6 +13,7 @@ app.use(express.json());
 app.use('/api/users', require('./routes/users.routes'));
 app.use('/api/classes', require('./routes/classes.routes'));
 app.use('/api/subjects', require('./routes/subjects.routes'));
+app.use('/api/class-subjects', require('./routes/class-subjects.routes'));
 
 // DB sync + szerver indítás
 (async () => {

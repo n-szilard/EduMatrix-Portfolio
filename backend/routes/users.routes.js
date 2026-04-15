@@ -176,6 +176,17 @@ router.get('/', authenticateToken, authorizeRoles('admin'), async (req, res) => 
   }
 });
 
+// GET /api/teachers összes tanár (csak admin)
+router.get('/teachers', authenticateToken, authorizeRoles('admin'), async (req, res) => {
+  try {
+    const teachers = await Teacher.findAll();
+    return res.json(teachers);
+  } catch (error) {
+    console.error('Teachers list hiba:', error.message);
+    return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
+  }
+});
+
 // POST /api/users  (csak admin)
 router.post(
   '/',

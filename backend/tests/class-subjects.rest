@@ -1,0 +1,104 @@
+# Fontos: ehhez kell legalább 1 létező Class, Subject, Teacher a DB-ben.
+
+@baseUrl = http://localhost:4000/api
+
+###
+# @name loginAdmin
+POST {{baseUrl}}/users/login
+Content-Type: application/json
+
+{
+	"username": "admin",
+	"password": "adminpass"
+}
+
+### 1) Osztályok listázása (kell egy class_id)
+# Elvárt: 200 + tömb
+# @name getClasses
+GET {{baseUrl}}/classes
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 2) Tantárgyak listázása (kell egy subject_id)
+# Elvárt: 200 + tömb
+# @name getSubjects
+GET {{baseUrl}}/subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 3) Tanárok listázása (kell egy teacher_id)
+# Elvárt: 200 + tömb
+# Megjegyzés: ha nálad más endpoint, írd át (pl. /teachers)
+# @name getTeachers
+GET {{baseUrl}}/users/teachers
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 4) Válasszunk egy-egy ID-t az első elemből
+# Ha üres a lista, előbb seedelj / hozz létre adatot.
+@classId = {{getClasses.response.body.$[0].id}}
+@subjectId = {{getSubjects.response.body.$[0].id}}
+@teacherId = {{getTeachers.response.body.$[0].id}}
+
+### 5) Kapcsolatok listázása (admin/teacher jogosultság)
+# Elvárt: 200 + tömb (include-olt Class/Subject/Teacher mezőkkel)
+GET {{baseUrl}}/class-subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 6) Új osztály–tantárgy–tanár kapcsolat létrehozása
+# Elvárt: 201 + létrehozott rekord (id, class_id, subject_id, teacher_id)
+# @name createClassSubject
+POST {{baseUrl}}/class-subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "class_id": "{{classId}}",
+  "subject_id": "{{subjectId}}",
+  "teacher_id": "{{teacherId}}"
+}
+
+### 7) Kapcsolat lekérése id alapján
+# Elvárt: 200 + rekord (include-okkal)
+GET {{baseUrl}}/class-subjects/{{createClassSubject.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 8) Duplikáció teszt (ugyanazzal a 3 ID-val)
+# Elvárt: 409
+POST {{baseUrl}}/class-subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "class_id": "{{classId}}",
+  "subject_id": "{{subjectId}}",
+  "teacher_id": "{{teacherId}}"
+}
+
+### 9) Validáció teszt (hiányzó mező)
+# Elvárt: 400
+POST {{baseUrl}}/class-subjects
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "class_id": "{{classId}}",
+  "subject_id": "{{subjectId}}"
+}
+
+### 10) Módosítás teszt (PATCH) - csak teacher váltás (ha van másik teacher)
+# @name patchClassSubject
+PATCH {{baseUrl}}/class-subjects/{{createClassSubject.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+Content-Type: application/json
+
+{
+  "teacher_id": "{{teacherId}}"
+}
+
+### 11) Törlés
+# Elvárt: 204
+DELETE {{baseUrl}}/class-subjects/{{createClassSubject.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
+
+### 12) Ellenőrzés: törölt kapcsolat lekérése
+# Elvárt: 404
+GET {{baseUrl}}/class-subjects/{{createClassSubject.response.body.$.id}}
+Authorization: Bearer {{loginAdmin.response.body.$.token}}
