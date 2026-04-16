@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { Class, Subject, Teacher, ClassSubject, Absence, Grade, Timetable } = require('../models');
+const { Class, Subject, Teacher, User, ClassSubject, Absence, Grade, Timetable } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
 function normalizePayload(body) {
@@ -23,7 +23,10 @@ router.get(
         include: [
           { model: Class },
           { model: Subject },
-          { model: Teacher },
+          {
+            model: Teacher,
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'full_name'] }],
+          },
         ],
       });
 
@@ -47,7 +50,10 @@ router.get(
         include: [
           { model: Class },
           { model: Subject },
-          { model: Teacher },
+          {
+            model: Teacher,
+            include: [{ model: User, attributes: ['id', 'username', 'email', 'full_name'] }],
+          },
         ],
       });
 

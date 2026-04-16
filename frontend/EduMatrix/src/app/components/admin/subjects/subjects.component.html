@@ -1,0 +1,146 @@
+<p-toast position="top-right" />
+
+<div class="flex h-screen overflow-hidden">
+  <app-admin-sidebar [navLinks]="navLinks" />
+
+  <main class="flex-1 flex flex-column overflow-y-auto">
+    <app-admin-topbar title="Tantárgyak" [userName]="adminName()" userRoleLabel="Adminisztrátor" />
+
+    <div class="flex flex-column gap-5 p-5">
+      <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-color font-bold text-2xl m-0">Tantárgykezelés</h2>
+          <p class="text-color-secondary text-sm mt-1 mb-0">Új tantárgyak létrehozása és a meglévők karbantartása.</p>
+        </div>
+        <p-button label="Új tantárgy" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+      </div>
+
+      <div class="grid">
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 bg-primary-reverse text-primary">
+              <i class="pi pi-book"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Összes tantárgy</div>
+              <div class="text-color font-bold text-2xl">{{ totalSubjects() }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-green-500">
+              <i class="pi pi-check-circle"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Használt tantárgyak</div>
+              <div class="text-color font-bold text-2xl">{{ assignedSubjects() }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-orange-500">
+              <i class="pi pi-inbox"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Szabad tantárgyak</div>
+              <div class="text-color font-bold text-2xl">{{ unassignedSubjects() }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="surface-card border-round-xl border-1 surface-border overflow-hidden">
+        <p-table
+          [value]="subjects()"
+          [loading]="loading()"
+          [paginator]="true"
+          [rows]="10"
+          [globalFilterFields]="['name']"
+          dataKey="id"
+          styleClass="p-datatable-sm"
+          #dt
+        >
+          <ng-template #caption>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-3 pb-2">
+              <span class="text-color font-semibold">Tantárgyak listája</span>
+              <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input
+                  pInputText
+                  type="text"
+                  placeholder="Keresés..."
+                  (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                  class="w-18rem"
+                />
+              </p-iconfield>
+            </div>
+          </ng-template>
+
+          <ng-template #header>
+            <tr>
+              <th pSortableColumn="name">Név <p-sortIcon field="name" /></th>
+              <th>Hozzárendelések</th>
+              <th class="text-right">Műveletek</th>
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-subject>
+            <tr>
+              <td class="font-medium">{{ subject.name }}</td>
+              <td>
+                <p-badge [value]="subject.assignmentCount" [severity]="subject.assignmentCount > 0 ? 'success' : 'secondary'" />
+              </td>
+              <td>
+                <div class="flex justify-content-end gap-2">
+                  <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Szerkesztés" (onClick)="openEditDialog(subject)" />
+                  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Törlés" (onClick)="deleteSubject(subject)" />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="3">
+                <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
+                  <i class="pi pi-book text-color-secondary" style="font-size: 3rem;"></i>
+                  <span class="text-color-secondary text-lg font-medium">Nincs még tantárgy rögzítve</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [header]="isEditMode() ? 'Tantárgy szerkesztése' : 'Új tantárgy'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '30rem' }"
+>
+  <div class="flex flex-column gap-3 pt-2">
+    <label class="text-color font-medium text-sm">Tantárgy neve</label>
+    <input
+      pInputText
+      class="w-full"
+      placeholder="Pl. Matematika"
+      [ngModel]="subjectName()"
+      (ngModelChange)="subjectName.set($event)"
+    />
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Mégse" severity="secondary" (onClick)="dialogVisible.set(false)" />
+      <p-button label="Mentés" (onClick)="saveSubject()" />
+    </div>
+  </ng-template>
+</p-dialog>

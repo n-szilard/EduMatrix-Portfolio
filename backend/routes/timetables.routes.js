@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { Op } = require('sequelize');
-const { Timetable, ClassSubject, Class, Subject, Teacher } = require('../models');
+const { Timetable, ClassSubject, Class, Subject, Teacher, User } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
 // Apró kompatibilitási réteg: a frontend/REST kliens használhat camelCase mezőneveket is.
@@ -50,7 +50,14 @@ router.get(
                 include: [
                     {
                         model: ClassSubject,
-                        include: [{ model: Class }, { model: Subject }, { model: Teacher }],
+                        include: [
+                            { model: Class },
+                            { model: Subject },
+                            {
+                                model: Teacher,
+                                include: [{ model: User, attributes: ['id', 'username', 'email', 'full_name'] }],
+                            },
+                        ],
                     },
                 ],
             });
@@ -75,7 +82,14 @@ router.get(
                 include: [
                     {
                         model: ClassSubject,
-                        include: [{ model: Class }, { model: Subject }, { model: Teacher }],
+                        include: [
+                            { model: Class },
+                            { model: Subject },
+                            {
+                                model: Teacher,
+                                include: [{ model: User, attributes: ['id', 'username', 'email', 'full_name'] }],
+                            },
+                        ],
                     },
                 ],
             });

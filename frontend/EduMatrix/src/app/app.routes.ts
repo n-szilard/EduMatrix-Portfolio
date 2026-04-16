@@ -8,6 +8,9 @@ import { DashboardComponent } from './components/admin/dashboard/dashboard.compo
 import { UsersComponent } from './components/admin/users/users.component';
 import { NotfoundComponent } from './components/system/notfound/notfound.component';
 import { ClassesComponent } from './components/admin/classes/classes.component';
+import { SubjectsComponent } from './components/admin/subjects/subjects.component';
+import { ClassSubjectsComponent } from './components/admin/class-subjects/class-subjects.component';
+import { TimetableComponent } from './components/admin/timetable/timetable.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { StudentDashboardComponent } from './components/student/student-dashboard/student-dashboard.component';
@@ -31,6 +34,9 @@ export const routes: Routes = [
             { path: 'dashboard', component: DashboardComponent },
             { path: 'users', component: UsersComponent },
             { path: 'classes', component: ClassesComponent },
+            { path: 'subjects', component: SubjectsComponent },
+            { path: 'class-subjects', component: ClassSubjectsComponent },
+            { path: 'timetable', component: TimetableComponent },
         ],
     },
     {

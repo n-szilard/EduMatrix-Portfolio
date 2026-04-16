@@ -1,0 +1,149 @@
+<p-toast position="top-right" />
+
+<div class="flex h-screen overflow-hidden">
+    <app-admin-sidebar [navLinks]="navLinks" />
+
+    <main class="flex-1 flex flex-column overflow-y-auto">
+        <app-admin-topbar title="Hozzárendelések" [userName]="adminName()" userRoleLabel="Adminisztrátor" />
+
+        <div class="flex flex-column gap-5 p-5">
+            <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+                <div>
+                    <h2 class="text-color font-bold text-2xl m-0">Osztály-tantárgy-tanár kapcsolatok</h2>
+                    <p class="text-color-secondary text-sm mt-1 mb-0">Ezekből épülnek az órarendi slotok.</p>
+                </div>
+                <p-button label="Új hozzárendelés" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+            </div>
+
+            <div class="grid">
+                <div class="col-12 md:col-4">
+                    <div
+                        class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+                        <div
+                            class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 bg-primary-reverse text-primary">
+                            <i class="pi pi-link"></i>
+                        </div>
+                        <div>
+                            <div class="text-color-secondary text-xs font-medium mb-1">Összes kapcsolat</div>
+                            <div class="text-color font-bold text-2xl">{{ totalConnections() }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4">
+                    <div
+                        class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+                        <div
+                            class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-primary">
+                            <i class="pi pi-sitemap"></i>
+                        </div>
+                        <div>
+                            <div class="text-color-secondary text-xs font-medium mb-1">Érintett osztályok</div>
+                            <div class="text-color font-bold text-2xl">{{ classCount() }}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 md:col-4">
+                    <div
+                        class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border">
+                        <div
+                            class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-indigo-500">
+                            <i class="pi pi-graduation-cap"></i>
+                        </div>
+                        <div>
+                            <div class="text-color-secondary text-xs font-medium mb-1">Érintett tanárok</div>
+                            <div class="text-color font-bold text-2xl">{{ teacherCount() }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="surface-card border-round-xl border-1 surface-border overflow-hidden">
+                <p-table [value]="classSubjects()" [loading]="loading()" [paginator]="true" [rows]="10"
+                    [globalFilterFields]="['className', 'subjectName', 'teacherName']" dataKey="id"
+                    styleClass="p-datatable-sm" #dt>
+                    <ng-template #caption>
+                        <div class="flex align-items-center justify-content-between flex-wrap gap-3 pb-2">
+                            <span class="text-color font-semibold">Kapcsolatok listája</span>
+                            <p-iconfield>
+                                <p-inputicon styleClass="pi pi-search" />
+                                <input pInputText type="text" placeholder="Keresés..."
+                                    (input)="dt.filterGlobal($any($event.target).value, 'contains')" class="w-18rem" />
+                            </p-iconfield>
+                        </div>
+                    </ng-template>
+
+                    <ng-template #header>
+                        <tr>
+                            <th>Osztály</th>
+                            <th>Tantárgy</th>
+                            <th>Tanár</th>
+                            <th class="text-right">Műveletek</th>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template #body let-row>
+                        <tr>
+                            <td><p-tag [value]="row.className" severity="info" /></td>
+                            <td class="font-medium">{{ row.subjectName }}</td>
+                            <td>{{ row.teacherName }}</td>
+                            <td>
+                                <div class="flex justify-content-end gap-2">
+                                    <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary"
+                                        pTooltip="Szerkesztés" (onClick)="openEditDialog(row)" />
+                                    <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger"
+                                        pTooltip="Törlés" (onClick)="deleteClassSubject(row)" />
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template #emptymessage>
+                        <tr>
+                            <td colspan="4">
+                                <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
+                                    <i class="pi pi-table text-color-secondary" style="font-size: 3rem;"></i>
+                                    <span class="text-color-secondary text-lg font-medium">Nincs még
+                                        hozzárendelés</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<p-dialog [visible]="dialogVisible()" (visibleChange)="dialogVisible.set($event)"
+    [header]="isEditMode() ? 'Hozzárendelés szerkesztése' : 'Új hozzárendelés'" [modal]="true" [draggable]="false"
+    [resizable]="false" [style]="{ width: '34rem' }">
+    <div class="flex flex-column gap-4 pt-2">
+        <div class="flex flex-column gap-2">
+            <label class="text-color font-medium text-sm">Osztály</label>
+            <p-dropdown [options]="classOptions()" [ngModel]="selectedClassId()"
+                (ngModelChange)="selectedClassId.set($event)" placeholder="Válassz osztályt" optionLabel="label"
+                optionValue="value" appendTo="body" styleClass="w-full" />
+        </div>
+
+        <div class="flex flex-column gap-2">
+            <label class="text-color font-medium text-sm">Tantárgy</label>
+            <p-dropdown [options]="subjectOptions()" [ngModel]="selectedSubjectId()"
+                (ngModelChange)="selectedSubjectId.set($event)" placeholder="Válassz tantárgyat" optionLabel="label"
+                optionValue="value" appendTo="body" styleClass="w-full" />
+        </div>
+
+        <div class="flex flex-column gap-2">
+            <label class="text-color font-medium text-sm">Tanár</label>
+            <p-dropdown [options]="teacherOptions()" [ngModel]="selectedTeacherId()"
+                (ngModelChange)="selectedTeacherId.set($event)" placeholder="Válassz tanárt" optionLabel="label"
+                optionValue="value" appendTo="body" styleClass="w-full" />
+        </div>
+    </div>
+
+    <ng-template #footer>
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Mégse" severity="secondary" (onClick)="dialogVisible.set(false)" />
+            <p-button label="Mentés" (onClick)="saveClassSubject()" />
+        </div>
+    </ng-template>
+</p-dialog>
