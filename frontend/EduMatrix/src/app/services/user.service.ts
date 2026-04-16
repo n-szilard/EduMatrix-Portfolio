@@ -10,6 +10,17 @@ export interface RoleDto {
   name: RoleName;
 }
 
+export interface TeacherDto {
+  id: string;
+  user_id: string;
+  User?: {
+    id: string;
+    username: string;
+    full_name: string;
+    email: string;
+  };
+}
+
 export interface UserDto {
   id: string;
   username: string;
@@ -71,6 +82,12 @@ export class UserService {
 
   getUsers(): Observable<UserDto[]> {
     return this.http.get<UserDto[]>(`${this.apiBaseUrl}/users`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  getTeachers(): Observable<TeacherDto[]> {
+    return this.http.get<TeacherDto[]>(`${this.apiBaseUrl}/users/teachers`, {
       headers: this.authHeaders(),
     });
   }

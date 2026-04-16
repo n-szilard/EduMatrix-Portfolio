@@ -75,9 +75,12 @@ export class ClassesComponent implements OnInit {
   totalFreeStudents = computed(() => this.freeStudents().length);
 
   navLinks = [
-    { label: 'Irányítópult', icon: 'pi pi-home', routerLink: '/admin/dashboard' },
+    { label: 'Vezérlőpult', icon: 'pi pi-home', routerLink: '/admin/dashboard' },
     { label: 'Felhasználók', icon: 'pi pi-users', routerLink: '/admin/users' },
     { label: 'Osztályok', icon: 'pi pi-sitemap', routerLink: '/admin/classes' },
+    { label: 'Tantárgyak', icon: 'pi pi-book', routerLink: '/admin/subjects' },
+    { label: 'Hozzárendelések', icon: 'pi pi-table', routerLink: '/admin/class-subjects' },
+    { label: 'Órarend', icon: 'pi pi-calendar', routerLink: '/admin/timetable' },
   ];
 
   constructor(

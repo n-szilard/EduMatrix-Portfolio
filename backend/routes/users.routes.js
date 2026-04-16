@@ -176,10 +176,18 @@ router.get('/', authenticateToken, authorizeRoles('admin'), async (req, res) => 
   }
 });
 
-// GET /api/teachers összes tanár (csak admin)
+// GET /api/users/teachers összes tanár user adatokkal (csak admin)
 router.get('/teachers', authenticateToken, authorizeRoles('admin'), async (req, res) => {
   try {
-    const teachers = await Teacher.findAll();
+    const teachers = await Teacher.findAll({
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'username', 'email', 'full_name'],
+        },
+      ],
+      order: [[User, 'full_name', 'ASC']],
+    });
     return res.json(teachers);
   } catch (error) {
     console.error('Teachers list hiba:', error.message);

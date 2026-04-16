@@ -1,0 +1,268 @@
+<p-toast position="top-right" />
+
+<div class="flex h-screen overflow-hidden">
+  <app-admin-sidebar [navLinks]="navLinks" />
+
+  <main class="flex-1 flex flex-column overflow-y-auto">
+    <app-admin-topbar title="Órarend" [userName]="adminName()" userRoleLabel="Adminisztrátor" />
+
+    <div class="flex flex-column gap-5 p-5 timetable-page">
+      <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <h2 class="text-color font-bold text-2xl m-0">Heti órarend szerkesztő</h2>
+          <p class="text-color-secondary text-sm mt-1 mb-0">Válassz osztályt, majd nap és óraszám szerint építsd a bejegyzéseket.</p>
+        </div>
+        <p-button label="Új bejegyzés" icon="pi pi-plus" (onClick)="openCreateDialog()" />
+      </div>
+
+      <div class="grid align-items-stretch">
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border h-full">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 bg-primary-reverse text-primary">
+              <i class="pi pi-sitemap"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Aktív osztály</div>
+              <div class="text-color font-bold text-2xl">{{ selectedClass()?.name || 'Nincs kiválasztva' }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border h-full">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-green-500">
+              <i class="pi pi-calendar"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Slotok</div>
+              <div class="text-color font-bold text-2xl">{{ totalSlots() }}</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 md:col-4">
+          <div class="stat-card border-round-xl p-4 flex align-items-center gap-3 surface-card border-1 surface-border h-full">
+            <div class="stat-icon flex align-items-center justify-content-center border-circle flex-shrink-0 surface-200 text-red-500">
+              <i class="pi pi-exclamation-triangle"></i>
+            </div>
+            <div>
+              <div class="text-color-secondary text-xs font-medium mb-1">Ütköző slotok</div>
+              <div class="text-color font-bold text-2xl">{{ conflictSlots() }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="surface-card border-round-xl border-1 surface-border p-4">
+        <div class="flex flex-column gap-3 mb-4">
+          <label class="text-color font-medium text-sm">Osztály kiválasztása</label>
+          <p-dropdown
+            [options]="classOptions()"
+            [ngModel]="selectedClassId()"
+            (ngModelChange)="onClassFilterChange($event)"
+            placeholder="Válassz osztályt"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            styleClass="w-full md:w-24rem"
+          />
+        </div>
+
+        <div class="timetable-grid overflow-x-auto">
+          <table class="w-full timetable-table">
+            <thead>
+              <tr>
+                <th class="slot-col">Óra</th>
+                <th *ngFor="let day of days">{{ day.label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of gridRows()">
+                <th class="slot-col">{{ row.lessonNumber }}. óra</th>
+                <td *ngFor="let cell of row.cells">
+                  <div class="timetable-cell flex flex-column gap-2">
+                    <div *ngIf="cell.entries.length === 0" class="empty-slot text-600">
+                      <span>Üres</span>
+                      <p-button
+                        icon="pi pi-plus"
+                        size="small"
+                        [text]="true"
+                        severity="secondary"
+                        pTooltip="Slot hozzáadása"
+                        (onClick)="openCreateDialog(cell.day, cell.lessonNumber)"
+                      />
+                    </div>
+
+                    <div *ngIf="cell.entries.length > 0" class="flex flex-column gap-2">
+                      <div *ngFor="let entry of cell.entries" class="slot-card scheduled-entry border-round-lg p-3 border-1 surface-border bg-white">
+                        <div class="flex align-items-start justify-content-between gap-2 mb-2">
+                          <div class="scheduled-subject inline-flex align-items-center gap-2 px-2 py-1 border-round surface-300 text-xs font-medium">
+                            <i class="pi pi-book text-primary"></i>
+                            <span>{{ entry.subjectName }}</span>
+                          </div>
+                          <span class="scheduled-lesson text-xs">{{ entry.lesson_number }}. óra</span>
+                        </div>
+                        <div class="scheduled-class text-sm font-medium">{{ entry.className }}</div>
+                        <div class="scheduled-teacher text-xs inline-flex align-items-center gap-2">
+                          <i class="pi pi-user"></i>
+                          <span>{{ entry.teacherName }}</span>
+                        </div>
+                        <div class="flex justify-content-end gap-1 mt-3">
+                          <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="Szerkesztés" (onClick)="openEditDialog(entry)" />
+                          <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" pTooltip="Törlés" (onClick)="deleteTimetable(entry)" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="surface-card border-round-xl border-1 surface-border overflow-hidden">
+        <p-table
+          [value]="selectedClassRows()"
+          [loading]="loading()"
+          [paginator]="true"
+          [rows]="10"
+          [globalFilterFields]="['className', 'subjectName', 'teacherName', 'day_of_week']"
+          dataKey="id"
+          styleClass="p-datatable-sm"
+          #dt
+        >
+          <ng-template #caption>
+            <div class="flex align-items-center justify-content-between flex-wrap gap-3 pb-2">
+              <span class="text-color font-semibold">Órarend bejegyzések</span>
+              <p-iconfield>
+                <p-inputicon styleClass="pi pi-search" />
+                <input
+                  pInputText
+                  type="text"
+                  placeholder="Keresés..."
+                  (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+                  class="w-18rem"
+                />
+              </p-iconfield>
+            </div>
+          </ng-template>
+
+          <ng-template #header>
+            <tr>
+              <th>Nap</th>
+              <th>Óra</th>
+              <th>Osztály</th>
+              <th>Tantárgy</th>
+              <th>Tanár</th>
+              <th class="text-right">Műveletek</th>
+            </tr>
+          </ng-template>
+
+          <ng-template #body let-row>
+            <tr>
+              <td>{{ row.day_of_week }}</td>
+              <td>{{ row.lesson_number }}.</td>
+              <td>{{ row.className }}</td>
+              <td class="font-medium">{{ row.subjectName }}</td>
+              <td>{{ row.teacherName }}</td>
+              <td>
+                <div class="flex justify-content-end gap-2">
+                  <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Szerkesztés" (onClick)="openEditDialog(row)" />
+                  <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" pTooltip="Törlés" (onClick)="deleteTimetable(row)" />
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template #emptymessage>
+            <tr>
+              <td colspan="6">
+                <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
+                  <i class="pi pi-calendar text-color-secondary" style="font-size: 3rem;"></i>
+                  <span class="text-color-secondary text-lg font-medium">Nincs még órarendi bejegyzés</span>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [header]="isEditMode() ? 'Órarend szerkesztése' : 'Új órarend bejegyzés'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '36rem' }"
+>
+  <div class="flex flex-column gap-4 pt-2">
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">Osztály</label>
+      <p-dropdown
+        [options]="classOptions()"
+        [ngModel]="selectedClassId()"
+        (ngModelChange)="onClassFilterChange($event)"
+        placeholder="Válassz osztályt"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="flex flex-column gap-2">
+      <label class="text-color font-medium text-sm">Osztály-tantárgy-tanár kapcsolat</label>
+      <p-dropdown
+        [options]="classSubjectOptions()"
+        [ngModel]="selectedClassSubjectId()"
+        (ngModelChange)="selectedClassSubjectId.set($event)"
+        placeholder="Válassz kapcsolatot"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        styleClass="w-full"
+      />
+    </div>
+
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <div class="flex flex-column gap-2">
+          <label class="text-color font-medium text-sm">Nap</label>
+          <p-dropdown
+            [options]="days"
+            [ngModel]="selectedDay()"
+            (ngModelChange)="selectedDay.set($event)"
+            placeholder="Válassz napot"
+            optionLabel="label"
+            optionValue="value"
+            appendTo="body"
+            styleClass="w-full"
+          />
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <div class="flex flex-column gap-2">
+          <label class="text-color font-medium text-sm">Óraszám</label>
+          <input
+            pInputText
+            type="number"
+            min="0"
+            class="w-full"
+            [ngModel]="selectedLessonNumber()"
+            (ngModelChange)="selectedLessonNumber.set($event)"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <div class="flex justify-content-end gap-2">
+      <p-button label="Mégse" severity="secondary" (onClick)="dialogVisible.set(false)" />
+      <p-button label="Mentés" (onClick)="saveTimetable()" />
+    </div>
+  </ng-template>
+</p-dialog>

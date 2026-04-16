@@ -85,10 +85,12 @@ export class DashboardComponent implements OnInit {
   adminName = signal<string>('Admin');
 
   navLinks = [
-  { icon: 'pi pi-home', label: 'Vezérlőpult', routerLink: ['/admin/dashboard'] },
-  { icon: 'pi pi-users', label: 'Felhasználók', routerLink: ['/admin/users'] },
-  { icon: 'pi pi-sitemap', label: 'Osztályok', routerLink: ['/admin/classes'] },
-  // később: { icon: 'pi pi-calendar', label: 'Órarend', routerLink: ['/admin/schedule'] },
+    { icon: 'pi pi-home', label: 'Vezérlőpult', routerLink: ['/admin/dashboard'] },
+      { icon: 'pi pi-users', label: 'Felhasználók', routerLink: ['/admin/users'] },
+    { icon: 'pi pi-sitemap', label: 'Osztályok', routerLink: ['/admin/classes'] },
+    { icon: 'pi pi-book', label: 'Tantárgyak', routerLink: ['/admin/subjects'] },
+    { icon: 'pi pi-table', label: 'Hozzárendelések', routerLink: ['/admin/class-subjects'] },
+    { icon: 'pi pi-calendar', label: 'Órarend', routerLink: ['/admin/timetable'] },
   ];
 
   statCards: StatCard[] = [
