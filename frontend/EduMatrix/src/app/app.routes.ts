@@ -48,6 +48,20 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
             { path: 'grades', component: GradesComponent },
+            { path: 'notes', component: NotesComponent },
+
+        ],
+    },
+    {
+        path: 'teacher',
+        canActivate: [roleGuard(['teacher', 'admin'])],
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+            { path: 'dashboard', component: StudentDashboardComponent },
+            { path: 'grades', component: GradesComponent },
+            { path: 'notes', component: NotesComponent },
+
+            { path: 'timetable', component: StudentTimetableComponent },
         ],
     },
     { path: '**', component: NotfoundComponent },
