@@ -27,6 +27,29 @@ router.get('/', authenticateToken, authorizeRoles(['admin', 'teacher']), async (
   }
 });
 
+// GET összes diák listája (tanár/admin)
+router.get('/students', authenticateToken, authorizeRoles(['admin', 'teacher']), async (req, res) => {
+  try {
+    const students = await Student.findAll({
+      order: [['id', 'ASC']],
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'full_name', 'username', 'email'],
+        },
+        {
+          model: Class,
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+    return res.json(students);
+  } catch (error) {
+    console.error('Hiba az összes diák lekérése során:', error);
+    return res.status(500).json({ error: 'Sikertelen diáklista lekérés' });
+  }
+});
+
 // GET szabad diákok listája
 router.get('/students/free', authenticateToken, authorizeRoles(['admin', 'teacher']), async (req, res) => {
   try {

@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
     static associate(models) {
       Student.belongsTo(models.User, { foreignKey: 'user_id' });
       Student.belongsTo(models.Class, { foreignKey: 'class_id' });
-      Student.hasMany(models.Note, { foreignKey: 'student_id' });
+      Student.hasMany(models.Note, { foreignKey: 'student_id', constraints: false, foreignKeyConstraint: false });
       Student.hasMany(models.Absence, { foreignKey: 'student_id' });
       Student.hasMany(models.Grade, { foreignKey: 'student_id' });
     }
