@@ -3,7 +3,7 @@ const { Model, DataTypes } = require('sequelize');
 module.exports = (sequelize) => {
   class Note extends Model {
     static associate(models) {
-      Note.belongsTo(models.Student, { foreignKey: 'student_id' });
+      Note.belongsTo(models.Student, { foreignKey: 'student_id', constraints: false, foreignKeyConstraint: false });
       Note.belongsTo(models.Teacher, { foreignKey: 'teacher_id' });
     }
   }
@@ -17,13 +17,22 @@ module.exports = (sequelize) => {
       },
       student_id: {
         type: DataTypes.UUID,
-        allowNull: false,
-        references: { model: 'students', key: 'id' },
+        allowNull: true,
       },
       teacher_id: {
         type: DataTypes.UUID,
         allowNull: false,
         references: { model: 'teachers', key: 'id' },
+      },
+      title: {
+        type: DataTypes.STRING(200),
+        allowNull: true,
+        defaultValue: '',
+      },
+      category: {
+        type: DataTypes.STRING(30),
+        allowNull: true,
+        defaultValue: 'Tanulmányi',
       },
       content: {
         type: DataTypes.TEXT,

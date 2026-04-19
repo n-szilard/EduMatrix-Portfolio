@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin, of, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 export interface ClassDto {
   id: string;
@@ -17,6 +18,10 @@ export interface StudentDto {
     full_name: string;
     username: string;
     email: string;
+  };
+  Class?: {
+    id: string;
+    name: string;
   };
 }
 
@@ -98,6 +103,64 @@ export class ClassService {
     return this.http.get<StudentDto[]>(`${this.apiBaseUrl}/classes/${encodeURIComponent(classId)}/students`, {
       headers: this.authHeaders(),
     });
+  }
+
+  // Összes diák
+  getAllStudents(): Observable<StudentDto[]> {
+    return this.http.get<StudentDto[]>(`${this.apiBaseUrl}/classes/students`, {
+      headers: this.authHeaders(),
+    }).pipe(
+      catchError((err) => {
+        if (err?.status !== 404) {
+          return throwError(() => err);
+        }
+
+        return this.getAllStudentsFallback();
+      })
+    );
+  }
+
+  private getAllStudentsFallback(): Observable<StudentDto[]> {
+    return this.getClasses().pipe(
+      switchMap((classes) => {
+        const byClass$ = (classes ?? []).map((c) =>
+          this.getClassStudents(c.id).pipe(
+            catchError(() => of([])),
+            map((students) => (students ?? []).map((s) => ({
+              ...s,
+              Class: { id: c.id, name: c.name },
+            })))
+          )
+        );
+
+        return forkJoin([
+          this.getFreeStudents().pipe(catchError(() => of([]))),
+          ...(byClass$.length ? byClass$ : [of([])]),
+        ]).pipe(
+          map((groups) => this.dedupeStudents(groups.flat()))
+        );
+      })
+    );
+  }
+
+  private dedupeStudents(list: StudentDto[]): StudentDto[] {
+    const byId = new Map<string, StudentDto>();
+
+    for (const s of list) {
+      const prev = byId.get(s.id);
+      if (!prev) {
+        byId.set(s.id, s);
+        continue;
+      }
+      byId.set(s.id, {
+        ...prev,
+        ...s,
+        User: s.User ?? prev.User,
+        Class: s.Class ?? prev.Class,
+      });
+    }
+
+    return Array.from(byId.values());
   }
 
   // Osztály nélküli diákok
