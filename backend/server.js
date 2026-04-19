@@ -16,6 +16,7 @@ app.use('/api/grades', require('./routes/grades.routes'));
 app.use('/api/subjects', require('./routes/subjects.routes'));
 app.use('/api/class-subjects', require('./routes/class-subjects.routes'));
 app.use('/api/timetables', require('./routes/timetables.routes'));
+app.use('/api/notes', require('./routes/notes.routes'));
 
 // DB sync + szerver indítás
 (async () => {

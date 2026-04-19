@@ -15,6 +15,7 @@ import { authGuard, roleGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { StudentDashboardComponent } from './components/student/student-dashboard/student-dashboard.component';
 import { GradesComponent } from './components/student/grades/grades.component';
+import { NotesComponent } from './components/teacher/notes/notes.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -46,6 +47,19 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
             { path: 'grades', component: GradesComponent },
+            { path: 'notes', component: NotesComponent },
+
+        ],
+    },
+    {
+        path: 'teacher',
+        canActivate: [roleGuard(['teacher', 'admin'])],
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+            { path: 'dashboard', component: StudentDashboardComponent },
+            { path: 'grades', component: GradesComponent },
+            { path: 'notes', component: NotesComponent },
+
         ],
     },
     { path: '**', component: NotfoundComponent },
