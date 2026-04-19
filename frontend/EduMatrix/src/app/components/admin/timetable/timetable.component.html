@@ -105,6 +105,10 @@
                           <i class="pi pi-user"></i>
                           <span>{{ entry.teacherName }}</span>
                         </div>
+                        <div class="scheduled-room text-xs inline-flex align-items-center gap-2">
+                          <i class="pi pi-map-marker"></i>
+                          <span>Terem: {{ entry.roomNumber }}</span>
+                        </div>
                         <div class="flex justify-content-end gap-1 mt-3">
                           <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small" pTooltip="Szerkesztés" (onClick)="openEditDialog(entry)" />
                           <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small" pTooltip="Törlés" (onClick)="deleteTimetable(entry)" />
@@ -153,6 +157,7 @@
               <th>Osztály</th>
               <th>Tantárgy</th>
               <th>Tanár</th>
+              <th>Terem</th>
               <th class="text-right">Műveletek</th>
             </tr>
           </ng-template>
@@ -164,6 +169,7 @@
               <td>{{ row.className }}</td>
               <td class="font-medium">{{ row.subjectName }}</td>
               <td>{{ row.teacherName }}</td>
+              <td>{{ row.roomNumber }}</td>
               <td>
                 <div class="flex justify-content-end gap-2">
                   <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" pTooltip="Szerkesztés" (onClick)="openEditDialog(row)" />
@@ -175,7 +181,7 @@
 
           <ng-template #emptymessage>
             <tr>
-              <td colspan="6">
+              <td colspan="7">
                 <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
                   <i class="pi pi-calendar text-color-secondary" style="font-size: 3rem;"></i>
                   <span class="text-color-secondary text-lg font-medium">Nincs még órarendi bejegyzés</span>
@@ -253,6 +259,19 @@
             class="w-full"
             [ngModel]="selectedLessonNumber()"
             (ngModelChange)="selectedLessonNumber.set($event)"
+          />
+        </div>
+      </div>
+      <div class="col-12 md:col-6">
+        <div class="flex flex-column gap-2">
+          <label class="text-color font-medium text-sm">Terem</label>
+          <input
+            pInputText
+            type="text"
+            class="w-full"
+            [ngModel]="selectedRoomNumber()"
+            (ngModelChange)="selectedRoomNumber.set($event)"
+            placeholder="Pl. 204"
           />
         </div>
       </div>

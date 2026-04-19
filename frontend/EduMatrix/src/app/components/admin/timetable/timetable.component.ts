@@ -32,6 +32,7 @@ interface TimetableRow extends TimetableDto {
   className: string;
   subjectName: string;
   teacherName: string;
+  roomNumber: string;
 }
 
 interface GridCell {
@@ -79,6 +80,7 @@ export class TimetableComponent implements OnInit {
   selectedClassSubjectId = signal('');
   selectedDay = signal<DayOfWeek>('Monday');
   selectedLessonNumber = signal(1);
+  selectedRoomNumber = signal('');
 
   readonly days: Array<{ label: string; value: DayOfWeek }> = [
     { label: 'Hétfő', value: 'Monday' },
@@ -183,6 +185,7 @@ export class TimetableComponent implements OnInit {
     this.selectedDay.set(day || 'Monday');
     this.selectedLessonNumber.set(lessonNumber ?? 0);
     this.selectedClassSubjectId.set('');
+    this.selectedRoomNumber.set('');
 
     if (!this.selectedClassId() && this.classes().length > 0) {
       this.selectedClassId.set(this.classes()[0].id);
@@ -198,6 +201,7 @@ export class TimetableComponent implements OnInit {
     this.selectedClassSubjectId.set(row.class_subject_id);
     this.selectedDay.set(row.day_of_week);
     this.selectedLessonNumber.set(row.lesson_number);
+    this.selectedRoomNumber.set(row.room_number || '');
     this.dialogVisible.set(true);
   }
 
@@ -205,8 +209,9 @@ export class TimetableComponent implements OnInit {
     const classSubjectId = this.selectedClassSubjectId();
     const day = this.selectedDay();
     const lessonNumber = Number(this.selectedLessonNumber());
+    const roomNumber = this.selectedRoomNumber().trim();
 
-    if (!classSubjectId || !day || Number.isNaN(lessonNumber)) {
+    if (!classSubjectId || !day || Number.isNaN(lessonNumber) || !roomNumber) {
       this.messageService.add({ severity: 'warn', summary: 'Hiányzó adat', detail: 'Minden mező kitöltése kötelező.' });
       return;
     }
@@ -245,6 +250,7 @@ export class TimetableComponent implements OnInit {
             class_subject_id: classSubjectId,
             day_of_week: day,
             lesson_number: lessonNumber,
+            room_number: roomNumber,
           })
         );
         this.messageService.add({ severity: 'success', summary: 'Siker', detail: 'Órarend bejegyzés módosítva.' });
@@ -254,6 +260,7 @@ export class TimetableComponent implements OnInit {
             class_subject_id: classSubjectId,
             day_of_week: day,
             lesson_number: lessonNumber,
+            room_number: roomNumber,
           })
         );
         this.messageService.add({ severity: 'success', summary: 'Siker', detail: 'Órarend bejegyzés létrehozva.' });
@@ -325,6 +332,7 @@ export class TimetableComponent implements OnInit {
           className: row.ClassSubject?.Class?.name || row.ClassSubject?.class_id || row.class_subject_id,
           subjectName: row.ClassSubject?.Subject?.name || row.class_subject_id,
           teacherName: row.ClassSubject?.Teacher?.User?.full_name || row.ClassSubject?.teacher_id || row.class_subject_id,
+          roomNumber: row.room_number || '-',
         }))
       );
     } catch (error: any) {
