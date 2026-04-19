@@ -1,1 +1,34 @@
-<p>student-dashboard works!</p>
+<div class="student-dashboard p-4">
+	<div class="mb-4">
+		<h2 class="m-0 text-2xl font-bold">Diák vezérlőpult</h2>
+		<p class="m-0 text-500 text-sm">Gyors elérés a saját tanulmányi adataidhoz.</p>
+	</div>
+
+	<div class="grid">
+		<div class="col-12 md:col-6">
+			<p-card>
+				<div class="flex flex-column gap-3">
+					<div class="flex align-items-center gap-2">
+						<i class="pi pi-book text-primary"></i>
+						<span class="font-semibold">Jegyeim</span>
+					</div>
+					<div class="text-sm text-600">Nézd meg tantárgyanként az összes jegyedet és átlagodat.</div>
+					<a pButton routerLink="/student/grades" icon="pi pi-arrow-right" iconPos="right" label="Megnyitás" class="p-button-sm w-fit"></a>
+				</div>
+			</p-card>
+		</div>
+
+		<div class="col-12 md:col-6">
+			<p-card>
+				<div class="flex flex-column gap-3">
+					<div class="flex align-items-center gap-2">
+						<i class="pi pi-calendar text-primary"></i>
+						<span class="font-semibold">Saját órarend</span>
+					</div>
+					<div class="text-sm text-600">Lásd a neked beállított heti órarendet napokra és órákra bontva.</div>
+					<a pButton routerLink="/student/timetable" icon="pi pi-arrow-right" iconPos="right" label="Megnyitás" class="p-button-sm w-fit"></a>
+				</div>
+			</p-card>
+		</div>
+	</div>
+</div>

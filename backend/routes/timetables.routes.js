@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { Op } = require('sequelize');
-const { Timetable, ClassSubject, Class, Subject, Teacher, User } = require('../models');
+const { Timetable, ClassSubject, Class, Subject, Teacher, User, Student } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
 // Apró kompatibilitási réteg: a frontend/REST kliens használhat camelCase mezőneveket is.
@@ -11,6 +11,7 @@ function normalizePayload(body) {
         class_subject_id: body.class_subject_id ?? body.classSubjectId,
         day_of_week: body.day_of_week ?? body.dayOfWeek,
         lesson_number: body.lesson_number ?? body.lessonNumber,
+        room_number: body.room_number ?? body.roomNumber,
     };
 }
 
@@ -69,6 +70,63 @@ router.get(
     }
 );
 
+// GET saját (bejelentkezett diák) órarend
+router.get(
+    '/me',
+    authenticateToken,
+    authorizeRoles(['student', 'admin']),
+    async (req, res) => {
+        try {
+            const userId = req.user?.id;
+            if (!userId) {
+                return res.status(401).json({ message: 'Nincs bejelentkezett felhasználó.' });
+            }
+
+            const student = await Student.findOne({ where: { user_id: userId } });
+            if (!student?.class_id) {
+                return res.status(200).json([]);
+            }
+
+            const classSubjects = await ClassSubject.findAll({
+                where: { class_id: student.class_id },
+                attributes: ['id'],
+            });
+
+            const classSubjectIds = classSubjects.map((item) => item.id);
+            if (classSubjectIds.length === 0) {
+                return res.status(200).json([]);
+            }
+
+            const rows = await Timetable.findAll({
+                where: {
+                    class_subject_id: { [Op.in]: classSubjectIds },
+                },
+                order: [
+                    ['day_of_week', 'ASC'],
+                    ['lesson_number', 'ASC'],
+                ],
+                include: [
+                    {
+                        model: ClassSubject,
+                        include: [
+                            { model: Class },
+                            { model: Subject },
+                            {
+                                model: Teacher,
+                                include: [{ model: User, attributes: ['id', 'username', 'email', 'full_name'] }],
+                            },
+                        ],
+                    },
+                ],
+            });
+
+            return res.status(200).json(rows);
+        } catch (error) {
+            return res.status(500).json({ message: 'Hiba történt a saját órarend lekérése során.' });
+        }
+    }
+);
+
 // GET órarend lekérése id alapján
 router.get(
     '/:id',
@@ -112,9 +170,10 @@ router.post(
     authenticateToken,
     authorizeRoles(['admin']),
     async (req, res) => {
-        const { class_subject_id, day_of_week, lesson_number } = normalizePayload(req.body);
+        const { class_subject_id, day_of_week, lesson_number, room_number } = normalizePayload(req.body);
+        const normalizedRoomNumber = typeof room_number === 'string' ? room_number.trim() : '';
 
-        if (!class_subject_id || !day_of_week || lesson_number === undefined) {
+        if (!class_subject_id || !day_of_week || lesson_number === undefined || !normalizedRoomNumber) {
             return res.status(400).json({ message: 'Minden mező kitöltése kötelező.' });
         }
         if (!isValidDayOfWeek(day_of_week)) {
@@ -141,6 +200,7 @@ router.post(
                 class_subject_id,
                 day_of_week,
                 lesson_number: Number(lesson_number),
+                room_number: normalizedRoomNumber,
             });
 
             return res.status(201).json(created);
@@ -183,6 +243,12 @@ router.patch(
                     return res.status(400).json({ message: 'Érvénytelen óraszám (lesson_number).' });
                 }
                 row.lesson_number = Number(payload.lesson_number);
+            }
+            if (payload.room_number !== undefined) {
+                if (typeof payload.room_number !== 'string' || !payload.room_number.trim()) {
+                    return res.status(400).json({ message: 'Érvénytelen teremszám (room_number).' });
+                }
+                row.room_number = payload.room_number.trim();
             }
 
             // Ütközés ellenőrzés (ne legyen duplikáció a módosítás után)

@@ -1,0 +1,19 @@
+.student-dashboard {
+	min-height: calc(100vh - 80px);
+	background: var(--surface-ground);
+	color: var(--text-color);
+}
+
+.text-500 {
+	color: var(--text-color-secondary) !important;
+}
+
+:host ::ng-deep .p-card {
+	border: 1px solid var(--surface-border);
+	border-radius: 12px;
+	box-shadow: none;
+}
+
+.w-fit {
+	width: fit-content;
+}
