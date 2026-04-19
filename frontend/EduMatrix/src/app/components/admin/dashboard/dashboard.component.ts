@@ -1,5 +1,7 @@
-import { Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 import {
   Chart,
@@ -31,6 +33,11 @@ import { InputIconModule } from 'primeng/inputicon';
 import { AdminSidebarComponent } from '../layout/admin-sidebar/admin-sidebar.component';
 import { AdminTopbarComponent } from '../layout/admin-topbar/admin-topbar.component';
 import { AuthService } from '../../../services/auth.service';
+import { UserService } from '../../../services/user.service';
+import { ClassService } from '../../../services/class.service';
+import { SubjectService } from '../../../services/subject.service';
+import { ClassSubjectService } from '../../../services/class-subject.service';
+import { TimetableService } from '../../../services/timetable.service';
 
 export interface ActivityLog {
   icon: string;
@@ -53,6 +60,7 @@ export interface StatCard {
 export interface QuickAction {
   icon: string;
   label: string;
+  routerLink: string;
 }
 
 @Component({
@@ -60,6 +68,7 @@ export interface QuickAction {
   standalone: true,
   imports: [
     CommonModule,
+  RouterModule,
   AdminSidebarComponent,
   AdminTopbarComponent,
     ButtonModule,
@@ -78,10 +87,11 @@ export interface QuickAction {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
   @ViewChild('performanceCanvas') performanceCanvas?: ElementRef<HTMLCanvasElement>;
 
   private performanceChart?: Chart;
+  private viewInitialized = false;
   adminName = signal<string>('Admin');
 
   navLinks = [
@@ -93,81 +103,31 @@ export class DashboardComponent implements OnInit {
     { icon: 'pi pi-calendar', label: 'Órarend', routerLink: ['/admin/timetable'] },
   ];
 
-  statCards: StatCard[] = [
-    {
-      label: 'Összes tanuló',
-      value: '1 240',
-      icon: 'pi pi-users',
-      badgeLabel: '+12%',
-      badgeClass: 'badge-success',
-      subLabel: 'előző hónaphoz képest',
-    },
-    {
-      label: 'Aktív tanárok',
-      value: '85',
-      icon: 'pi pi-graduation-cap',
-      badgeLabel: '+2%',
-      badgeClass: 'badge-success',
-      subLabel: 'szolgálatban',
-    },
-    {
-      label: 'Jelenlét arány',
-      value: '94.2%',
-      icon: 'pi pi-check-circle',
-      badgeLabel: 'Ma',
-      badgeClass: 'badge-primary',
-      subLabel: 'Átlagnak megfelelő.',
-    },
-  ];
+  statCards: StatCard[] = [];
 
-  activityLogs: ActivityLog[] = [
-    {
-      icon: 'pi pi-user-plus',
-      iconBg: 'log-icon-success',
-      iconColor: 'text-green-600',
-      title: 'Új tanuló regisztrált',
-      description: '"Kiss Anna" beiratkozott a 10.B osztályba',
-      time: '10 perce',
-    },
-    {
-      icon: 'pi pi-file-edit',
-      iconBg: 'log-icon-primary',
-      iconColor: 'text-primary',
-      title: 'Órarend módosítva',
-      description: 'Kémia labor B átkerült a 204-es terembe',
-      time: '2 órája',
-    },
-    {
-      icon: 'pi pi-chart-bar',
-      iconBg: 'log-icon-warning',
-      iconColor: 'text-orange-500',
-      title: 'Jelentés elkészült',
-      description: 'Havi pénzügyi összesítő elérhető',
-      time: '5 órája',
-    },
-    {
-      icon: 'pi pi-shield',
-      iconBg: 'log-icon-danger',
-      iconColor: 'text-red-500',
-      title: 'Admin bejelentkezés',
-      description: 'Biztonságos bejelentkezés: 192.168.1.45',
-      time: '8 órája',
-    },
-  ];
+  activityLogs: ActivityLog[] = [];
 
   quickActions: QuickAction[] = [
-    { icon: 'pi pi-user-plus', label: 'Tanuló hozzáadása' },
-    { icon: 'pi pi-upload', label: 'Jegyek feltöltése' },
-    { icon: 'pi pi-envelope', label: 'Szülők értesítése' },
-    { icon: 'pi pi-pencil', label: 'Dolgozat kiosztása' },
+    { icon: 'pi pi-user-plus', label: 'Felhasználó hozzáadása', routerLink: '/admin/users' },
+    { icon: 'pi pi-sitemap', label: 'Osztályok kezelése', routerLink: '/admin/classes' },
+    { icon: 'pi pi-table', label: 'Hozzárendelések', routerLink: '/admin/class-subjects' },
+    { icon: 'pi pi-calendar', label: 'Órarend szerkesztése', routerLink: '/admin/timetable' },
   ];
 
-  chartMonths = ['Jan', 'Feb', 'Már', 'Ápr', 'Máj', 'Jún'];
+  chartMonths = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap'];
+  chartSampleData = [0, 0, 0, 0, 0, 0, 0];
+  chartHeadlineValue = '0';
+  chartHeadlineLabel = 'órarendi bejegyzés összesen';
+  chartDeltaLabel = 'Valós adatok alapján';
 
-  // Minta adatsor (6 hónap) – a képen látható hullámzáshoz hasonló
-  chartSampleData = [3.1, 3.35, 3.05, 3.3, 3.55, 3.2];
-
-  constructor(private authService: AuthService) {
+  constructor(
+    private authService: AuthService,
+    private userService: UserService,
+    private classService: ClassService,
+    private subjectService: SubjectService,
+    private classSubjectService: ClassSubjectService,
+    private timetableService: TimetableService,
+  ) {
     Chart.register(
       LineController,
       LineElement,
@@ -182,6 +142,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadAdminName();
+    void this.loadDashboardData();
   }
 
   private loadAdminName(): void {
@@ -196,7 +157,144 @@ export class DashboardComponent implements OnInit {
   }
 
   ngAfterViewInit(): void {
+    this.viewInitialized = true;
     this.initPerformanceChart();
+  }
+
+  private async loadDashboardData(): Promise<void> {
+    try {
+      const [users, classes, subjects, classSubjects, timetables] = await Promise.all([
+        firstValueFrom(this.userService.getUsers()),
+        firstValueFrom(this.classService.getClasses()),
+        firstValueFrom(this.subjectService.getSubjects()),
+        firstValueFrom(this.classSubjectService.getClassSubjects()),
+        firstValueFrom(this.timetableService.getTimetables()),
+      ]);
+
+      const studentCount = users.filter((user) => user.role === 'student').length;
+      const teacherCount = users.filter((user) => user.role === 'teacher').length;
+      const pendingCount = users.filter((user) => user.role === 'pending').length;
+      const totalUserCount = users.length;
+      const todayLessons = timetables.filter((row) => row.day_of_week === this.currentDayOfWeek()).length;
+
+      this.statCards = [
+        {
+          label: 'Összes tanuló',
+          value: String(studentCount),
+          icon: 'pi pi-users',
+          badgeLabel: `${pendingCount} függő`,
+          badgeClass: pendingCount > 0 ? 'badge-primary' : 'badge-success',
+          subLabel: 'jóváhagyásra váró fiókok',
+        },
+        {
+          label: 'Aktív tanárok',
+          value: String(teacherCount),
+          icon: 'pi pi-graduation-cap',
+          badgeLabel: classes.length > 0 ? `${(teacherCount / classes.length).toFixed(1)}` : '0.0',
+          badgeClass: 'badge-success',
+          subLabel: 'tanár / osztály arány',
+        },
+        {
+          label: 'Mai órák száma',
+          value: String(todayLessons),
+          icon: 'pi pi-check-circle',
+          badgeLabel: this.dayLabelHu(this.currentDayOfWeek()),
+          badgeClass: 'badge-primary',
+          subLabel: 'aktuális napi terhelés',
+        },
+      ];
+
+      this.activityLogs = [
+        {
+          icon: 'pi pi-users',
+          iconBg: 'log-icon-success',
+          iconColor: 'text-green-600',
+          title: 'Felhasználók összesen',
+          description: `${totalUserCount} regisztrált felhasználó (${studentCount} diák, ${teacherCount} tanár).`,
+          time: 'Valós idejű összesítés',
+        },
+        {
+          icon: 'pi pi-sitemap',
+          iconBg: 'log-icon-primary',
+          iconColor: 'text-primary',
+          title: 'Osztályok és tantárgyak',
+          description: `${classes.length} osztály, ${subjects.length} tantárgy és ${classSubjects.length} aktív hozzárendelés.`,
+          time: 'Valós idejű összesítés',
+        },
+        {
+          icon: 'pi pi-calendar',
+          iconBg: 'log-icon-warning',
+          iconColor: 'text-orange-500',
+          title: 'Órarendi terhelés',
+          description: `${timetables.length} órarendi bejegyzés van a rendszerben, ebből ma ${todayLessons} esedékes.`,
+          time: 'Valós idejű összesítés',
+        },
+      ];
+
+      this.chartSampleData = this.chartMonths.map((_, idx) => {
+        const dayKey = this.dayOfWeekByIndex(idx);
+        return timetables.filter((row) => row.day_of_week === dayKey).length;
+      });
+      this.chartHeadlineValue = String(timetables.length);
+      this.chartHeadlineLabel = 'órarendi bejegyzés összesen';
+      this.chartDeltaLabel = `${todayLessons} bejegyzés a mai napon`;
+
+      if (this.viewInitialized) {
+        this.initPerformanceChart();
+      }
+    } catch (error) {
+      console.error('Dashboard betöltési hiba:', error);
+      this.statCards = [];
+      this.activityLogs = [];
+      this.chartSampleData = [0, 0, 0, 0, 0, 0, 0];
+      this.chartHeadlineValue = '0';
+      this.chartHeadlineLabel = 'adat nem elérhető';
+      this.chartDeltaLabel = 'A dashboard adatai nem tölthetők be';
+
+      if (this.viewInitialized) {
+        this.initPerformanceChart();
+      }
+    }
+  }
+
+  private dayOfWeekByIndex(index: number): 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday' {
+    const order: Array<'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'> = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+    return order[index] || 'Monday';
+  }
+
+  private currentDayOfWeek(): 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday' {
+    const map: Array<'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday'> = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    const day = map[new Date().getDay()];
+    return day === 'Sunday' ? 'Sunday' : day;
+  }
+
+  private dayLabelHu(day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday'): string {
+    const labels: Record<typeof day, string> = {
+      Monday: 'Hétfő',
+      Tuesday: 'Kedd',
+      Wednesday: 'Szerda',
+      Thursday: 'Csütörtök',
+      Friday: 'Péntek',
+      Saturday: 'Szombat',
+      Sunday: 'Vasárnap',
+    };
+    return labels[day];
   }
 
   private initPerformanceChart(): void {
