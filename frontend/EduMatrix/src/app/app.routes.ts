@@ -10,11 +10,12 @@ import { NotfoundComponent } from './components/system/notfound/notfound.compone
 import { ClassesComponent } from './components/admin/classes/classes.component';
 import { SubjectsComponent } from './components/admin/subjects/subjects.component';
 import { ClassSubjectsComponent } from './components/admin/class-subjects/class-subjects.component';
-import { TimetableComponent } from './components/admin/timetable/timetable.component';
+import { TimetableComponent as AdminTimetableComponent } from './components/admin/timetable/timetable.component';
 import { authGuard, roleGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { StudentDashboardComponent } from './components/student/student-dashboard/student-dashboard.component';
 import { GradesComponent } from './components/student/grades/grades.component';
+import { TimetableComponent as StudentTimetableComponent } from './components/student/timetable/timetable.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -36,7 +37,7 @@ export const routes: Routes = [
             { path: 'classes', component: ClassesComponent },
             { path: 'subjects', component: SubjectsComponent },
             { path: 'class-subjects', component: ClassSubjectsComponent },
-            { path: 'timetable', component: TimetableComponent },
+            { path: 'timetable', component: AdminTimetableComponent },
         ],
     },
     {
@@ -46,6 +47,7 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
             { path: 'grades', component: GradesComponent },
+            { path: 'timetable', component: StudentTimetableComponent },
         ],
     },
     { path: '**', component: NotfoundComponent },
