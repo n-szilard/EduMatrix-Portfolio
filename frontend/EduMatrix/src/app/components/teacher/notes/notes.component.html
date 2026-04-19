@@ -1,0 +1,302 @@
+<div class="notes-page">
+
+  <div class="notes-header">
+    <div class="notes-title">
+      <h2 class="m-0">Feljegyzések</h2>
+      <p class="m-0">Intézményi és személyes feljegyzések áttekintése</p>
+    </div>
+
+    @if (canCreate()) {
+      <p-button
+        label="Új feljegyzés"
+        icon="pi pi-plus"
+        size="small"
+        [rounded]="true"
+        (onClick)="openNewNoteDialog()"
+      />
+    }
+  </div>
+
+  <div class="notes-toolbar">
+    <span class="p-input-icon-left notes-search">
+      <i class="pi pi-search"></i>
+      <input
+        pInputText
+        type="text"
+        placeholder="Keresés a feljegyzések között..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="searchTerm.set($event)"
+        class="w-full"
+      />
+    </span>
+
+    <div class="notes-filters">
+      @for (f of filters; track f) {
+        <p-button
+          [label]="f"
+          size="small"
+          [rounded]="true"
+          [outlined]="activeFilter() !== f"
+          [severity]="activeFilter() === f ? 'primary' : 'secondary'"
+          styleClass="note-filter"
+          (onClick)="setFilter(f)"
+        />
+      }
+
+      <p-button
+        label="Szűrők"
+        icon="pi pi-sliders-h"
+        size="small"
+        [rounded]="true"
+        [outlined]="true"
+        severity="secondary"
+        styleClass="note-filter note-filter--tools"
+        (onClick)="openFiltersDialog()"
+      />
+    </div>
+  </div>
+
+  <div class="notes-list">
+    @if (loading()) {
+      <div class="notes-empty">Betöltés…</div>
+    }
+
+    @if (loadError()) {
+      <div class="notes-empty">
+        <div class="mb-3">{{ loadError() }}</div>
+        <p-button label="Újrapróbál" icon="pi pi-refresh" severity="secondary" [outlined]="true" [rounded]="true" (onClick)="reloadNotes()" />
+      </div>
+    }
+
+    @for (note of filteredNotes(); track note.id) {
+      <p-card styleClass="note-card">
+        <div class="note-row">
+
+          <div class="note-main">
+            <div class="note-meta">
+              <p-tag
+                [value]="note.category"
+                [severity]="categorySeverity(note.category)"
+                [rounded]="true"
+              />
+              <span class="note-date"><i class="pi pi-calendar"></i>{{ note.date }}</span>
+            </div>
+
+            <h3 class="note-title m-0">{{ note.title }}</h3>
+            <p class="note-content m-0">{{ note.content }}</p>
+          </div>
+
+          <div class="note-side">
+            @if (canCreate()) {
+              <div class="note-actions">
+                <p-button
+                  icon="pi pi-pencil"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  [rounded]="true"
+                  styleClass="note-action"
+                  pTooltip="Szerkesztés"
+                  (onClick)="openEditDialog(note)"
+                />
+                <p-button
+                  icon="pi pi-trash"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  [rounded]="true"
+                  styleClass="note-action"
+                  pTooltip="Törlés"
+                  (onClick)="deleteNote(note.id)"
+                />
+              </div>
+            }
+            <span class="note-author">Szerző: {{ note.author }}</span>
+          </div>
+
+        </div>
+      </p-card>
+    }
+
+    @if (!loading() && !loadError() && filteredNotes().length === 0) {
+      <div class="notes-empty">
+        <i class="pi pi-inbox"></i>
+        Nincs találat.
+      </div>
+    }
+
+    @if (filteredNotes().length > 0) {
+      <div class="notes-more">
+        <p-button
+          label="További feljegyzések betöltése"
+          icon="pi pi-chevron-down"
+          iconPos="right"
+          severity="secondary"
+          [outlined]="true"
+          [rounded]="true"
+          styleClass="note-more"
+          (onClick)="reloadNotes()"
+        />
+      </div>
+    }
+  </div>
+
+  <p-dialog
+    [visible]="filtersDialogVisible()"
+    (visibleChange)="filtersDialogVisible.set($event)"
+    header="Szűrők"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '28rem' }"
+  >
+    <div class="flex flex-column gap-4 pt-2">
+
+      <div class="flex flex-column gap-2">
+        <label class="text-color font-medium text-sm">Szerző</label>
+        <input
+          pInputText
+          type="text"
+          placeholder="pl. Kovács Péter"
+          [ngModel]="filterAuthor()"
+          (ngModelChange)="filterAuthor.set($event)"
+        />
+      </div>
+
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <div class="flex flex-column gap-2">
+            <label class="text-color font-medium text-sm">Dátum -tól</label>
+            <input
+              pInputText
+              type="date"
+              [ngModel]="filterFrom()"
+              (ngModelChange)="filterFrom.set($event)"
+            />
+          </div>
+        </div>
+
+        <div class="col-12 md:col-6">
+          <div class="flex flex-column gap-2">
+            <label class="text-color font-medium text-sm">Dátum -ig</label>
+            <input
+              pInputText
+              type="date"
+              [ngModel]="filterTo()"
+              (ngModelChange)="filterTo.set($event)"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex align-items-center justify-content-between gap-2">
+        <p-button
+          label="Szűrők törlése"
+          icon="pi pi-times"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="clearAdvancedFilters()"
+        />
+        <p-button
+          label="Bezár"
+          icon="pi pi-check"
+          (onClick)="filtersDialogVisible.set(false)"
+        />
+      </div>
+    </div>
+  </p-dialog>
+
+  <p-dialog
+    [visible]="noteDialogVisible()"
+    (visibleChange)="noteDialogVisible.set($event)"
+    [header]="editingNoteId() ? 'Feljegyzés szerkesztése' : 'Új feljegyzés'"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '34rem' }"
+  >
+    <div class="flex flex-column gap-4 pt-2">
+
+      @if (canCreate()) {
+        <div class="flex flex-column gap-2">
+          <label class="text-color font-medium text-sm">Tanuló <span class="text-red-500">*</span></label>
+          <p-dropdown
+            [options]="studentOptions()"
+            [filter]="true"
+            filterBy="label"
+            [showClear]="true"
+            placeholder="Válassz tanulót"
+            [ngModel]="draftStudentId()"
+            (ngModelChange)="draftStudentId.set($event)"
+            [disabled]="studentsLoading() || !!editingNoteId()"
+          />
+
+          @if (!studentsLoading() && studentOptions().length === 0) {
+            <div class="flex align-items-center justify-content-between gap-2">
+              <small class="text-color-secondary">Nem sikerült betölteni a diáklistát.</small>
+              <p-button
+                label="Diákok frissítése"
+                icon="pi pi-refresh"
+                size="small"
+                severity="secondary"
+                [outlined]="true"
+                (onClick)="reloadStudents()"
+              />
+            </div>
+          }
+        </div>
+      }
+
+      <div class="flex flex-column gap-2">
+        <label class="text-color font-medium text-sm">Cím <span class="text-red-500">*</span></label>
+        <input
+          pInputText
+          type="text"
+          placeholder="pl. Szülői értekezlet előkészítése"
+          [ngModel]="draftTitle()"
+          (ngModelChange)="draftTitle.set($event)"
+        />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label class="text-color font-medium text-sm">Kategória</label>
+        <p-dropdown
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="draftCategory()"
+          (ngModelChange)="draftCategory.set($event)"
+          placeholder="Válassz kategóriát"
+        />
+      </div>
+
+      <div class="flex flex-column gap-2">
+        <label class="text-color font-medium text-sm">Tartalom <span class="text-red-500">*</span></label>
+        <textarea
+          pTextarea
+          [autoResize]="true"
+          rows="5"
+          placeholder="Írd ide a feljegyzést…"
+          [ngModel]="draftContent()"
+          (ngModelChange)="draftContent.set($event)"
+        ></textarea>
+      </div>
+
+      <div class="flex align-items-center justify-content-end gap-2">
+        <p-button
+          label="Mégse"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="noteDialogVisible.set(false)"
+        />
+        <p-button
+          label="Mentés"
+          icon="pi pi-save"
+          [disabled]="!draftTitle().trim() || !draftContent().trim() || (!editingNoteId() && !draftStudentId())"
+          (onClick)="saveDraft()"
+        />
+      </div>
+    </div>
+  </p-dialog>
+
+</div>
