@@ -1,0 +1,104 @@
+<div class="flex flex-column gap-5 p-5 timetable-page">
+  <div class="flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h2 class="text-color font-bold text-2xl m-0">Saját órarend</h2>
+      <p class="text-color-secondary text-sm mt-1 mb-0">A saját osztályod heti órarendje napokra és óraszámokra bontva.</p>
+    </div>
+    <a pButton routerLink="/student/dashboard" class="p-button-outlined" icon="pi pi-home" label="Vissza a dashboardra"></a>
+  </div>
+
+  <div class="surface-card border-round-xl border-1 surface-border p-4">
+    @if (loadError) {
+      <div class="flex flex-column gap-3 align-items-center py-5 text-center">
+        <i class="pi pi-exclamation-triangle text-orange-500" style="font-size: 2rem"></i>
+        <div class="font-medium">{{ loadError }}</div>
+        <button pButton type="button" icon="pi pi-refresh" label="Újrapróbálás" class="p-button-sm" (click)="reload()"></button>
+      </div>
+    } @else if (loading) {
+      <div class="flex flex-column gap-3 align-items-center py-6 text-center">
+        <i class="pi pi-spin pi-spinner text-primary" style="font-size: 2rem"></i>
+        <div class="text-600">Órarend betöltése...</div>
+      </div>
+    } @else if (!hasData) {
+      <div class="flex flex-column align-items-center justify-content-center gap-3 py-6">
+        <i class="pi pi-calendar text-color-secondary" style="font-size: 3rem;"></i>
+        <span class="text-color-secondary text-lg font-medium">Nincs még órarendi bejegyzés</span>
+      </div>
+    } @else {
+      @if (isMobileView) {
+        <div class="mobile-day-nav flex align-items-center justify-content-between gap-2 mb-3">
+          <p-button icon="pi pi-chevron-left" [rounded]="true" [text]="true" severity="secondary" (onClick)="previousDay()" />
+          <span class="text-primary font-semibold">{{ mobileDayLabel }}</span>
+          <p-button icon="pi pi-chevron-right" [rounded]="true" [text]="true" severity="secondary" (onClick)="nextDay()" />
+        </div>
+
+        <div class="flex flex-column gap-2">
+          <div *ngFor="let lessonNumber of lessonNumbers" class="mobile-lesson border-1 surface-border border-round-lg p-2">
+            <div class="slot-col mobile-slot-col mb-2">{{ lessonNumber }}. óra</div>
+
+            <div *ngIf="mobileEntries(lessonNumber).length === 0" class="empty-slot text-600">
+              <span>Üres</span>
+            </div>
+
+            <div *ngIf="mobileEntries(lessonNumber).length > 0" class="flex flex-column gap-2">
+              <div *ngFor="let entry of mobileEntries(lessonNumber)" class="slot-card scheduled-entry border-round-lg p-3 border-1 surface-border bg-white">
+                <div class="flex align-items-start justify-content-between gap-2 mb-2">
+                  <div class="scheduled-subject inline-flex align-items-center gap-2 px-2 py-1 border-round surface-300 text-sm font-medium">
+                    <i class="pi pi-book text-primary"></i>
+                    <span>{{ entry.subjectName }}</span>
+                  </div>
+                  <span class="scheduled-lesson text-xs">{{ entry.lesson_number }}. óra</span>
+                </div>
+                <div class="scheduled-class text-sm font-medium">Terem: {{ entry.roomNumber }}</div>
+                <div class="scheduled-teacher text-xs inline-flex align-items-center gap-2">
+                  <i class="pi pi-user"></i>
+                  <span>{{ entry.teacherName }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="timetable-grid overflow-x-auto">
+          <table class="w-full timetable-table">
+            <thead>
+              <tr>
+                <th class="slot-col">Óra</th>
+                <th *ngFor="let day of days">{{ day.label }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of gridRows">
+                <th class="slot-col">{{ row.lessonNumber }}. óra</th>
+                <td *ngFor="let cell of row.cells">
+                  <div class="timetable-cell flex flex-column gap-2">
+                    <div *ngIf="cell.entries.length === 0" class="empty-slot text-600">
+                      <span>Üres</span>
+                    </div>
+
+                    <div *ngIf="cell.entries.length > 0" class="flex flex-column gap-2">
+                      <div *ngFor="let entry of cell.entries" class="slot-card scheduled-entry border-round-lg p-3 border-1 surface-border bg-white">
+                        <div class="flex align-items-start justify-content-between gap-2 mb-2">
+                          <div class="scheduled-subject inline-flex align-items-center gap-2 px-2 py-1 border-round surface-300 text-sm font-medium">
+                            <i class="pi pi-book text-primary"></i>
+                            <span>{{ entry.subjectName }}</span>
+                          </div>
+                          <span class="scheduled-lesson text-xs">{{ entry.lesson_number }}. óra</span>
+                        </div>
+                        <div class="scheduled-class text-sm font-medium">Terem: {{ entry.roomNumber }}</div>
+                        <div class="scheduled-teacher text-xs inline-flex align-items-center gap-2">
+                          <i class="pi pi-user"></i>
+                          <span>{{ entry.teacherName }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      }
+    }
+  </div>
+</div>

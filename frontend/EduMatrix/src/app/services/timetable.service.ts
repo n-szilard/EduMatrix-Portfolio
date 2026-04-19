@@ -18,6 +18,7 @@ export interface TimetableDto {
   class_subject_id: string;
   day_of_week: DayOfWeek;
   lesson_number: number;
+  room_number: string;
   ClassSubject?: ClassSubjectDto;
 }
 
@@ -25,12 +26,14 @@ export interface CreateTimetablePayload {
   class_subject_id: string;
   day_of_week: DayOfWeek;
   lesson_number: number;
+  room_number: string;
 }
 
 export interface UpdateTimetablePayload {
   class_subject_id?: string;
   day_of_week?: DayOfWeek;
   lesson_number?: number;
+  room_number?: string;
 }
 
 export interface TimetableQueryParams {
@@ -60,6 +63,12 @@ export class TimetableService {
     return this.http.get<TimetableDto[]>(`${this.apiBaseUrl}/timetables`, {
       headers: this.authHeaders(),
       params: params as Record<string, string | number | boolean>,
+    });
+  }
+
+  getMyTimetable(): Observable<TimetableDto[]> {
+    return this.http.get<TimetableDto[]>(`${this.apiBaseUrl}/timetables/me`, {
+      headers: this.authHeaders(),
     });
   }
 
