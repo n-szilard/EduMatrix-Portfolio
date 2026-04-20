@@ -24,6 +24,20 @@
 .notes-empty { color: var(--p-text-muted-color, var(--text-color-secondary)); }
 
 .notes-search { flex: 1; min-width: 240px; }
+
+.notes-search {
+  position: relative;
+}
+
+.notes-search > i {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  line-height: 1;
+  pointer-events: none;
+  color: var(--p-text-muted-color, var(--text-color-secondary));
+}
 .notes-filters { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
 .notes-list { display: flex; flex-direction: column; gap: .75rem; }
 

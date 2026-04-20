@@ -17,6 +17,7 @@ import { StudentDashboardComponent } from './components/student/student-dashboar
 import { GradesComponent } from './components/student/grades/grades.component';
 import { TimetableComponent as StudentTimetableComponent } from './components/student/timetable/timetable.component';
 import { NotesComponent } from './components/teacher/notes/notes.component';
+import { StudentNotesComponent } from './components/student/student-notes/student-notes.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -48,7 +49,7 @@ export const routes: Routes = [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
             { path: 'grades', component: GradesComponent },
-            { path: 'notes', component: NotesComponent },
+            { path: 'notes', component: StudentNotesComponent },
 
         ],
     },

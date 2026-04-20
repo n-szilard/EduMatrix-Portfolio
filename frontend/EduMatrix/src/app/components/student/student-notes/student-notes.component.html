@@ -1,0 +1,174 @@
+<div class="notes-page">
+
+	<div class="notes-header">
+		<div class="notes-title">
+			<h2 class="m-0">Feljegyzéseim</h2>
+			<p class="m-0">A tanáraid által neked írt feljegyzések</p>
+		</div>
+	</div>
+
+	<div class="notes-toolbar">
+		<span class="p-input-icon-left notes-search">
+			<i class="pi pi-search"></i>
+			<input
+				pInputText
+				type="text"
+				placeholder="Keresés a feljegyzések között..."
+				[ngModel]="searchTerm()"
+				(ngModelChange)="searchTerm.set($event)"
+				class="w-full"
+			/>
+		</span>
+
+		<div class="notes-filters">
+			@for (f of filters; track f) {
+				<p-button
+					[label]="f"
+					size="small"
+					[rounded]="true"
+					[outlined]="activeFilter() !== f"
+					[severity]="activeFilter() === f ? 'primary' : 'secondary'"
+					styleClass="note-filter"
+					(onClick)="setFilter(f)"
+				/>
+			}
+
+			<p-button
+				label="Szűrők"
+				icon="pi pi-sliders-h"
+				size="small"
+				[rounded]="true"
+				[outlined]="true"
+				severity="secondary"
+				styleClass="note-filter note-filter--tools"
+				(onClick)="openFiltersDialog()"
+			/>
+		</div>
+	</div>
+
+	<div class="notes-list">
+		@if (loading()) {
+			<div class="notes-empty">Betöltés…</div>
+		}
+
+		@if (loadError()) {
+			<div class="notes-empty">
+				<div class="mb-3">{{ loadError() }}</div>
+				<p-button label="Újrapróbál" icon="pi pi-refresh" severity="secondary" [outlined]="true" [rounded]="true" (onClick)="reloadNotes()" />
+			</div>
+		}
+
+		@for (note of filteredNotes(); track note.id) {
+			<p-card styleClass="note-card">
+				<div class="note-row">
+
+					<div class="note-main">
+						<div class="note-meta">
+							<p-tag
+								[value]="note.category"
+								[severity]="categorySeverity(note.category)"
+								[rounded]="true"
+							/>
+							<span class="note-date"><i class="pi pi-calendar"></i>{{ note.date }}</span>
+						</div>
+
+						<h3 class="note-title m-0">{{ note.title }}</h3>
+						<p class="note-content m-0">{{ note.content }}</p>
+					</div>
+
+					<div class="note-side">
+						<span class="note-author">Szerző: {{ note.author }}</span>
+					</div>
+
+				</div>
+			</p-card>
+		}
+
+		@if (!loading() && !loadError() && filteredNotes().length === 0) {
+			<div class="notes-empty">
+				<i class="pi pi-inbox"></i>
+				Nincs találat.
+			</div>
+		}
+
+		@if (filteredNotes().length > 0) {
+			<div class="notes-more">
+				<p-button
+					label="Frissítés"
+					icon="pi pi-refresh"
+					severity="secondary"
+					[outlined]="true"
+					[rounded]="true"
+					styleClass="note-more"
+					(onClick)="reloadNotes()"
+				/>
+			</div>
+		}
+	</div>
+
+	<p-dialog
+		[visible]="filtersDialogVisible()"
+		(visibleChange)="filtersDialogVisible.set($event)"
+		header="Szűrők"
+		[modal]="true"
+		[draggable]="false"
+		[resizable]="false"
+		[style]="{ width: '28rem' }"
+	>
+		<div class="flex flex-column gap-4 pt-2">
+
+			<div class="flex flex-column gap-2">
+				<label class="text-color font-medium text-sm">Szerző</label>
+				<input
+					pInputText
+					type="text"
+					placeholder="pl. Kovács Péter"
+					[ngModel]="filterAuthor()"
+					(ngModelChange)="filterAuthor.set($event)"
+				/>
+			</div>
+
+			<div class="grid">
+				<div class="col-12 md:col-6">
+					<div class="flex flex-column gap-2">
+						<label class="text-color font-medium text-sm">Dátum -tól</label>
+						<input
+							pInputText
+							type="date"
+							[ngModel]="filterFrom()"
+							(ngModelChange)="filterFrom.set($event)"
+						/>
+					</div>
+				</div>
+
+				<div class="col-12 md:col-6">
+					<div class="flex flex-column gap-2">
+						<label class="text-color font-medium text-sm">Dátum -ig</label>
+						<input
+							pInputText
+							type="date"
+							[ngModel]="filterTo()"
+							(ngModelChange)="filterTo.set($event)"
+						/>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex align-items-center justify-content-between gap-2">
+				<p-button
+					label="Szűrők törlése"
+					icon="pi pi-times"
+					severity="secondary"
+					[outlined]="true"
+					(onClick)="clearAdvancedFilters()"
+				/>
+				<p-button
+					label="Bezár"
+					icon="pi pi-check"
+					(onClick)="filtersDialogVisible.set(false)"
+				/>
+			</div>
+		</div>
+	</p-dialog>
+
+</div>
