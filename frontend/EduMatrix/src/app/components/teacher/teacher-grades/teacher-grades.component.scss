@@ -1,0 +1,115 @@
+
+.grades-page {
+	min-height: calc(100vh - 80px);
+	background: var(--surface-ground);
+	color: var(--text-color);
+
+	h2 { color: var(--text-color); }
+
+	.text-500 { color: var(--text-color-secondary) !important; }
+}
+
+.toolbar {
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.toolbar-left {
+	flex: 1;
+	min-width: 260px;
+	display: flex;
+	flex-direction: column;
+	gap: .35rem;
+}
+
+.toolbar-right {
+	display: flex;
+	gap: .5rem;
+}
+
+.student-cell {
+	vertical-align: middle;
+}
+
+.student-name {
+	font-weight: 800;
+}
+
+.grade-entry {
+	max-width: 160px;
+}
+
+.month-col,
+.month-cell {
+	width: 86px;
+	text-align: center;
+}
+
+.avg-col,
+.avg-cell {
+	width: 90px;
+	text-align: right;
+}
+
+.avg-value {
+	font-weight: 800;
+	color: var(--text-color-secondary);
+}
+
+.grade-chips--month {
+	justify-content: center;
+	min-height: 2rem;
+}
+
+.grade-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: .35rem;
+	align-items: center;
+}
+
+.grade-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 2.25rem;
+	height: 2rem;
+	padding: 0 .55rem;
+	border-radius: 10px;
+	font-weight: 900;
+	font-size: .95rem;
+	color: #fff;
+	background: var(--surface-500);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
+}
+
+.grade-chip[data-grade='5'] { background: #16a34a; }
+.grade-chip[data-grade='4'] { background: #2563eb; }
+.grade-chip[data-grade='3'] { background: #f59e0b; }
+.grade-chip[data-grade='2'] { background: #f97316; }
+.grade-chip[data-grade='1'] { background: #dc2626; }
+
+:host ::ng-deep {
+	.grades-table .p-datatable-thead > tr > th {
+		background: transparent;
+		border-color: var(--surface-border);
+		color: var(--text-color);
+	}
+	.grades-table .p-datatable-tbody > tr > td {
+		border-color: var(--surface-border);
+		vertical-align: middle;
+	}
+	.grades-table .p-datatable-tbody > tr:hover {
+		background: color-mix(in srgb, var(--surface-card) 85%, transparent);
+	}
+	.grade-entry .p-inputnumber-input {
+		width: 120px;
+		text-align: center;
+		font-weight: 900;
+		border-radius: 12px;
+	}
+}
+
