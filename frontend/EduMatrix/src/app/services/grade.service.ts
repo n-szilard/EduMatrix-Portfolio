@@ -17,6 +17,17 @@ export interface GradeItemDto {
   };
 }
 
+export interface GradeSubjectDto {
+  subject: {
+    id: string | null;
+    name: string;
+  };
+  class: {
+    id: string | null;
+    name: string | null;
+  };
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -36,6 +47,12 @@ export class GradeService {
 
   getMyGrades(): Observable<GradeItemDto[]> {
     return this.http.get<GradeItemDto[]>(`${this.apiBaseUrl}/grades/me`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  getMyGradeSubjects(): Observable<GradeSubjectDto[]> {
+    return this.http.get<GradeSubjectDto[]>(`${this.apiBaseUrl}/grades/me/subjects`, {
       headers: this.authHeaders(),
     });
   }

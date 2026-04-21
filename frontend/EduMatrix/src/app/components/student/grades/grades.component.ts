@@ -6,7 +6,7 @@ import { DividerModule } from 'primeng/divider';
 import { TooltipModule } from 'primeng/tooltip';
 import { firstValueFrom } from 'rxjs';
 
-import { GradeService, GradeItemDto } from '../../../services/grade.service';
+import { GradeService, GradeItemDto, GradeSubjectDto } from '../../../services/grade.service';
 
 interface UiGrade {
   value: number;
@@ -33,14 +33,28 @@ export class GradesComponent implements OnInit {
   constructor(private gradeService: GradeService) {}
 
   async ngOnInit(): Promise<void> {
-    const items = await firstValueFrom(this.gradeService.getMyGrades());
-    this.setUiData(items);
+    const [gradesResult, subjectsResult] = await Promise.allSettled([
+      firstValueFrom(this.gradeService.getMyGrades()),
+      firstValueFrom(this.gradeService.getMyGradeSubjects()),
+    ]);
+
+    const items = gradesResult.status === 'fulfilled' ? gradesResult.value : [];
+    const subjectRows = subjectsResult.status === 'fulfilled' ? subjectsResult.value : [];
+
+    this.setUiData(items, subjectRows);
   }
 
-  private setUiData(items: GradeItemDto[]): void {
-    this.className = items.find((x) => x.class?.name)?.class?.name ?? null;
+  private setUiData(items: GradeItemDto[], subjectRows: GradeSubjectDto[]): void {
+    this.className = items.find((x) => x.class?.name)?.class?.name ?? subjectRows.find((x) => x.class?.name)?.class?.name ?? null;
 
     const map = new Map<string, UiGrade[]>();
+    for (const subjectRow of subjectRows) {
+      const subjectName = subjectRow.subject?.name ?? 'Ismeretlen tantárgy';
+      if (!map.has(subjectName)) {
+        map.set(subjectName, []);
+      }
+    }
+
     for (const it of items) {
       const subjectName = it.subject?.name ?? 'Ismeretlen tantárgy';
       const list = map.get(subjectName) ?? [];
@@ -59,6 +73,10 @@ export class GradesComponent implements OnInit {
         grades: grades.sort((a, b) => (a.isoDate < b.isoDate ? 1 : -1)),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  hasGrades(grades: UiGrade[]): boolean {
+    return grades.length > 0;
   }
 
   getMonths(grades: UiGrade[]): string[] {
