@@ -32,6 +32,8 @@ export class TimetableComponent implements OnInit {
   rows: TimetableRow[] = [];
   isMobileView = false;
   mobileDayIndex = 0;
+  gridRows: Array<{ lessonNumber: number; cells: GridCell[] }> = [];
+  private entriesByDayAndLesson = new Map<string, TimetableRow[]>();
 
   readonly days: Array<{ label: string; value: DayOfWeek }> = [
     { label: 'Hétfő', value: 'Monday' },
@@ -66,17 +68,6 @@ export class TimetableComponent implements OnInit {
     return this.rows.length > 0;
   }
 
-  get gridRows(): Array<{ lessonNumber: number; cells: GridCell[] }> {
-    return this.lessonNumbers.map((lessonNumber) => ({
-      lessonNumber,
-      cells: this.days.map((day) => ({
-        day: day.value,
-        lessonNumber,
-        entries: this.rows.filter((row) => row.day_of_week === day.value && row.lesson_number === lessonNumber),
-      })),
-    }));
-  }
-
   get mobileDay(): DayOfWeek {
     return this.days[this.mobileDayIndex]?.value ?? 'Monday';
   }
@@ -94,9 +85,7 @@ export class TimetableComponent implements OnInit {
   }
 
   mobileEntries(lessonNumber: number): TimetableRow[] {
-    return this.rows.filter(
-      (row) => row.day_of_week === this.mobileDay && row.lesson_number === lessonNumber
-    );
+    return this.entriesByDayAndLesson.get(this.getEntryKey(this.mobileDay, lessonNumber)) ?? [];
   }
 
   private updateViewport(): void {
@@ -108,6 +97,34 @@ export class TimetableComponent implements OnInit {
     const today = map[new Date().getDay()] as DayOfWeek;
     const index = this.days.findIndex((day) => day.value === today);
     this.mobileDayIndex = index >= 0 ? index : 0;
+  }
+
+  private getEntryKey(day: DayOfWeek, lessonNumber: number): string {
+    return `${day}|${lessonNumber}`;
+  }
+
+  private rebuildGridData(): void {
+    const grouped = new Map<string, TimetableRow[]>();
+
+    for (const row of this.rows) {
+      const key = this.getEntryKey(row.day_of_week, row.lesson_number);
+      const bucket = grouped.get(key);
+      if (bucket) {
+        bucket.push(row);
+      } else {
+        grouped.set(key, [row]);
+      }
+    }
+
+    this.entriesByDayAndLesson = grouped;
+    this.gridRows = this.lessonNumbers.map((lessonNumber) => ({
+      lessonNumber,
+      cells: this.days.map((day) => ({
+        day: day.value,
+        lessonNumber,
+        entries: grouped.get(this.getEntryKey(day.value, lessonNumber)) ?? [],
+      })),
+    }));
   }
 
   private async loadTimetable(): Promise<void> {
@@ -123,9 +140,11 @@ export class TimetableComponent implements OnInit {
         teacherName: row.ClassSubject?.Teacher?.User?.full_name || row.ClassSubject?.teacher_id || 'Nincs tanár',
         roomNumber: row.room_number || '-',
       }));
+      this.rebuildGridData();
     } catch (error: any) {
       this.rows = [];
       this.loadError = error?.error?.message || 'Nem sikerült betölteni az órarendet.';
+      this.rebuildGridData();
     } finally {
       this.loading = false;
     }
