@@ -19,6 +19,7 @@ import { TimetableComponent as StudentTimetableComponent } from './components/st
 import { NotesComponent } from './components/teacher/notes/notes.component';
 import { StudentNotesComponent } from './components/student/student-notes/student-notes.component';
 import { TeacherGradesComponent } from './components/teacher/teacher-grades/teacher-grades.component';
+import { StudentLayoutComponent } from './components/student/layout/student-layout.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -46,9 +47,11 @@ export const routes: Routes = [
     {
         path: 'student',
         canActivate: [roleGuard(['student', 'admin'])],
+        component: StudentLayoutComponent,
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
+            { path: 'timetable', component: StudentTimetableComponent },
             { path: 'grades', component: GradesComponent },
             { path: 'notes', component: StudentNotesComponent },
 

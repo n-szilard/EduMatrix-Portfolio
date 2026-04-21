@@ -1,0 +1,61 @@
+<nav class="student-nav">
+  <div class="student-nav__inner">
+    <a class="student-nav__brand" routerLink="/student/dashboard" (click)="closeMenu()">
+      <span class="student-nav__brand-mark">
+        <i class="pi pi-graduation-cap"></i>
+      </span>
+      <span class="student-nav__brand-text">
+        <strong>EduMatrix</strong>
+        <small>Tanulói felület</small>
+      </span>
+    </a>
+
+    <button type="button" class="student-nav__toggle" (click)="toggleMenu()" [attr.aria-expanded]="menuOpen" aria-label="Menü megnyitása">
+      <i class="pi" [class.pi-bars]="!menuOpen" [class.pi-times]="menuOpen"></i>
+    </button>
+
+    <div class="student-nav__links" [class.is-open]="menuOpen">
+      <a routerLink="/student/dashboard" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/student/timetable" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-calendar"></i>
+        <span>Órarend</span>
+      </a>
+      <a routerLink="/student/grades" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-book"></i>
+        <span>Jegyek</span>
+      </a>
+      <a routerLink="/student/notes" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-pencil"></i>
+        <span>Feljegyzések</span>
+      </a>
+    </div>
+
+    <div class="student-nav__actions" [class.is-open]="menuOpen">
+      <a class="student-nav__home" routerLink="/" (click)="closeMenu()">
+        <i class="pi pi-globe"></i>
+        <span>Főoldal</span>
+      </a>
+
+      <a class="student-nav__profile" routerLink="/profile" (click)="closeMenu()">
+        <i class="pi pi-cog"></i>
+        <span>Beállítások</span>
+      </a>
+
+      <div class="student-nav__user">
+        <span class="student-nav__avatar">{{ userInitials }}</span>
+        <div class="student-nav__user-text">
+          <strong>{{ currentUser()?.full_name || currentUser()?.username || 'Tanuló' }}</strong>
+          <small>Bejelentkezve</small>
+        </div>
+      </div>
+
+      <button type="button" class="student-nav__logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Kijelentkezés</span>
+      </button>
+    </div>
+  </div>
+</nav>
