@@ -4,6 +4,10 @@ const router = express.Router();
 const { Class, Subject, Teacher, User, ClassSubject, Absence, Grade, Timetable } = require('../models');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
 
+async function getTeacher(userId) {
+  return Teacher.findOne({ where: { user_id: userId } });
+}
+
 function normalizePayload(body) {
   return {
     class_id: body.class_id ?? body.classId,
@@ -19,7 +23,19 @@ router.get(
   authorizeRoles(['admin', 'teacher']),
   async (req, res) => {
     try {
-      const classSubjects = await ClassSubject.findAll({
+  const where = {};
+
+  // Teacher csak a saját hozzárendeléseit lássa
+  if (req.user?.role === 'teacher') {
+    const teacher = await getTeacher(req.user.id);
+    if (!teacher) {
+      return res.status(403).json({ message: 'Nincs tanár profil rendelve ehhez a felhasználóhoz.' });
+    }
+    where.teacher_id = teacher.id;
+  }
+
+  const classSubjects = await ClassSubject.findAll({
+    where,
         include: [
           { model: Class },
           { model: Subject },

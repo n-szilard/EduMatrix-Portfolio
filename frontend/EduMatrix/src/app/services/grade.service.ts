@@ -17,6 +17,29 @@ export interface GradeItemDto {
   };
 }
 
+export interface CreateGradePayload {
+  student_id: string;
+  class_subject_id: string;
+  grade: number;
+  date: string; // YYYY-MM-DD
+}
+
+export interface GradebookStudentDto {
+  id: string;
+  class_id: string | null;
+  full_name: string | null;
+}
+
+export interface GradebookDto {
+  classSubject: {
+    id: string;
+    class: { id: string | null; name: string | null };
+    subject: { id: string | null; name: string | null };
+  };
+  students: GradebookStudentDto[];
+  gradesByStudentId: Record<string, GradeItemDto[]>;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -38,5 +61,24 @@ export class GradeService {
     return this.http.get<GradeItemDto[]>(`${this.apiBaseUrl}/grades/me`, {
       headers: this.authHeaders(),
     });
+  }
+
+  getStudentGrades(studentId: string): Observable<GradeItemDto[]> {
+    return this.http.get<GradeItemDto[]>(`${this.apiBaseUrl}/grades/student/${encodeURIComponent(studentId)}`, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  createGrade(payload: CreateGradePayload): Observable<GradeItemDto> {
+    return this.http.post<GradeItemDto>(`${this.apiBaseUrl}/grades`, payload, {
+      headers: this.authHeaders(),
+    });
+  }
+
+  getGradebook(classSubjectId: string): Observable<GradebookDto> {
+    return this.http.get<GradebookDto>(
+      `${this.apiBaseUrl}/grades/gradebook/${encodeURIComponent(classSubjectId)}`,
+      { headers: this.authHeaders() }
+    );
   }
 }
