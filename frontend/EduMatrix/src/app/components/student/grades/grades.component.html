@@ -18,35 +18,50 @@
             <div>
               <span class="font-bold text-lg">{{ subject.name }}</span>
             </div>
-            <p-tag
-              [value]="getAverage(subject.grades).toFixed(2)"
-              [severity]="avgColor(getAverage(subject.grades))"
-              styleClass="text-sm font-bold px-3"
-              pTooltip="Félév átlaga"
-            />
+            @if (hasGrades(subject.grades)) {
+              <p-tag
+                [value]="getAverage(subject.grades).toFixed(2)"
+                [severity]="avgColor(getAverage(subject.grades))"
+                styleClass="text-sm font-bold px-3"
+                pTooltip="Félév átlaga"
+              />
+            } @else {
+              <p-tag
+                value="Nincs jegy"
+                severity="secondary"
+                styleClass="text-sm font-bold px-3"
+                pTooltip="Még nincs rögzített jegy"
+              />
+            }
           </div>
           <p-divider styleClass="m-0" />
         </ng-template>
 
         <!-- Hónapok -->
-        <div class="flex flex-wrap gap-4 pt-1">
-          @for (month of getMonths(subject.grades); track month) {
-            <div class="month-block">
-              <p class="month-label">{{ month }}</p>
-              <div class="flex flex-wrap gap-2">
-                @for (grade of getByMonth(subject.grades, month); track grade.isoDate) {
-                  <div
-                    class="grade-chip grade-{{ grade.value }}"
-                    [pTooltip]="grade.dateLabel"
-                    tooltipPosition="top"
-                  >
-                    {{ grade.value }}
-                  </div>
-                }
+        @if (hasGrades(subject.grades)) {
+          <div class="flex flex-wrap gap-4 pt-1">
+            @for (month of getMonths(subject.grades); track month) {
+              <div class="month-block">
+                <p class="month-label">{{ month }}</p>
+                <div class="flex flex-wrap gap-2">
+                  @for (grade of getByMonth(subject.grades, month); track grade.isoDate) {
+                    <div
+                      class="grade-chip grade-{{ grade.value }}"
+                      [pTooltip]="grade.dateLabel"
+                      tooltipPosition="top"
+                    >
+                      {{ grade.value }}
+                    </div>
+                  }
+                </div>
               </div>
-            </div>
-          }
-        </div>
+            }
+          </div>
+        } @else {
+          <div class="pt-1 pb-2 text-500 text-sm font-medium">
+            Ehhez a tantárgyhoz még nincs rögzített jegy.
+          </div>
+        }
 
       </p-card>
     }
