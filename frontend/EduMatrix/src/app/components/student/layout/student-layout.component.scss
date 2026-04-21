@@ -1,0 +1,15 @@
+.student-layout {
+  min-height: 100vh;
+}
+
+.student-layout__content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem 1.25rem 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .student-layout__content {
+    padding: 1rem 0.9rem 2rem;
+  }
+}
