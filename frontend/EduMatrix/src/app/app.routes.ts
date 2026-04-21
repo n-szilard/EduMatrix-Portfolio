@@ -18,6 +18,7 @@ import { GradesComponent } from './components/student/grades/grades.component';
 import { TimetableComponent as StudentTimetableComponent } from './components/student/timetable/timetable.component';
 import { NotesComponent } from './components/teacher/notes/notes.component';
 import { StudentNotesComponent } from './components/student/student-notes/student-notes.component';
+import { TeacherGradesComponent } from './components/teacher/teacher-grades/teacher-grades.component';
 import { StudentLayoutComponent } from './components/student/layout/student-layout.component';
 
 export const routes: Routes = [
@@ -62,7 +63,7 @@ export const routes: Routes = [
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
             { path: 'dashboard', component: StudentDashboardComponent },
-            { path: 'grades', component: GradesComponent },
+            { path: 'grades', component: TeacherGradesComponent },
             { path: 'notes', component: NotesComponent },
 
             { path: 'timetable', component: StudentTimetableComponent },
