@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.features-page {
+  min-height: 100vh;
+  padding-top: 7rem;
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(13, 18, 31, 0.75) 0%,
+      rgba(13, 18, 31, 0.9) 45%,
+      rgba(10, 14, 24, 1) 100%
+    ),
+    radial-gradient(circle at 15% 20%, rgba(56, 189, 248, 0.18), transparent 45%),
+    radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.16), transparent 40%),
+    url('/img/homescreen_backdrop.jpg') center/cover no-repeat;
+}
+
+.kicker {
+  letter-spacing: 0.08em;
+  color: #93c5fd;
+  border: 1px solid rgba(147, 197, 253, 0.4);
+  background: rgba(30, 64, 175, 0.15);
+}
+
+.feature-card {
+  background: linear-gradient(
+    140deg,
+    rgba(15, 23, 42, 0.88) 0%,
+    rgba(15, 23, 42, 0.74) 100%
+  );
+  box-shadow: 0 14px 38px rgba(2, 6, 23, 0.35);
+}
+
+.feature-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.3);
+}
+
+:host ::ng-deep .feature-card .p-card-body {
+  padding: 1.6rem 1.6rem 1.4rem;
+}
+
+:host ::ng-deep .feature-card .p-card-content {
+  padding-top: 0.4rem;
+}
+
+@media (max-width: 900px) {
+  .features-page {
+    padding-top: 6.7rem;
+  }
+}
