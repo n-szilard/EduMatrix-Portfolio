@@ -1,0 +1,65 @@
+<app-header></app-header>
+
+<main class="about-page px-3 md:px-4 pb-5">
+  <section class="about-hero mx-auto text-center mb-5" style="max-width: 1080px;">
+    <span class="kicker inline-flex align-items-center px-3 py-2 mb-3 border-round-3xl text-xs font-bold uppercase">Rólunk</span>
+    <h1 class="m-0 text-white" style="font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.08;">EduMatrix csapat</h1>
+    <p class="mx-auto mt-3 mb-0 text-color-secondary line-height-3" style="max-width: 760px;">
+      Az EduMatrix mögött két fejlesztő, Nagyapáti Szilárd és Pálinkás Andor áll,
+      akik közös szemlélettel építették fel a rendszert: gyors, átlátható és emberközpontú
+      digitális megoldások az oktatás számára.
+    </p>
+  </section>
+
+  <section class="about-content mx-auto flex flex-column gap-3" style="max-width: 1080px;">
+    <p-card styleClass="about-card info-card border-1 border-round-xl border-200">
+      <ng-template pTemplate="header">
+        <h2 class="m-0 text-xl text-white">Közös történetünk</h2>
+      </ng-template>
+      <p class="mt-1 mb-0 text-color-secondary line-height-3">
+        A projekt indulásakor célunk az volt, hogy olyan platformot hozzunk létre,
+        amely egyszerre támogatja az iskolai adminisztrációt és javítja a napi felhasználói élményt.
+        A fejlesztés során mindketten végig jelen voltunk a teljes folyamatban,
+        a tervezéstől az implementáción át a finomhangolásig.
+      </p>
+      <p class="mt-3 mb-0 text-color-secondary line-height-3">
+        Az EduMatrix ezért nem különálló modulok gyűjteménye, hanem egy közösen kialakított,
+        egységes rendszer, ahol a backend stabilitása és a frontend használhatósága
+        kéz a kézben fejlődött.
+      </p>
+    </p-card>
+
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <p-card styleClass="about-card member-card h-full border-1 border-round-xl border-200" header="Nagyapáti Szilárd">
+          <p class="mt-3 mb-0 text-color-secondary line-height-3">
+            Szilárd a szerveroldali logika, adatszerkezetek és API-k kialakításában,
+            valamint a kliensoldali felületek fejlesztésében is aktív szerepet vállalt.
+          </p>
+        </p-card>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <p-card styleClass="about-card member-card h-full border-1 border-round-xl border-200" header="Pálinkás Andor">
+          <p class="mt-3 mb-0 text-color-secondary line-height-3">
+            Andor a backend folyamatok és adatkezelési megoldások mellett a frontend komponensek
+            megvalósításában és felhasználói folyamatok kialakításában is meghatározó volt.
+          </p>
+        </p-card>
+      </div>
+    </div>
+
+    <p-card styleClass="about-card info-card border-1 border-round-xl border-200">
+      <ng-template pTemplate="header">
+        <h2 class="m-0 text-xl text-white">Közös felelősség, közös minőség</h2>
+      </ng-template>
+      <p class="mt-1 mb-0 text-color-secondary line-height-3">
+        A fejlesztés során mindketten dolgoztunk backend és frontend feladatokon is,
+        így minden funkció technikai és felhasználói oldalról egyaránt átgondoltan készült el.
+        Ez a közös felelősség adja az EduMatrix stabilitásának és egységes élményének alapját.
+      </p>
+    </p-card>
+  </section>
+</main>
+
+<app-footer></app-footer>
