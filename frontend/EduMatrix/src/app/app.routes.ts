@@ -20,9 +20,13 @@ import { NotesComponent } from './components/teacher/notes/notes.component';
 import { StudentNotesComponent } from './components/student/student-notes/student-notes.component';
 import { TeacherGradesComponent } from './components/teacher/teacher-grades/teacher-grades.component';
 import { StudentLayoutComponent } from './components/student/layout/student-layout.component';
+import { AboutComponent } from './components/system/about/about.component';
+import { FeaturesComponent } from './components/system/features/features.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
+    { path: 'about', component: AboutComponent },
+    { path: 'features', component: FeaturesComponent },
     { path: 'login', component: LoginComponent },
     { path: 'logout', component: LogoutComponent },
     { path: 'register', component: RegisterComponent },
