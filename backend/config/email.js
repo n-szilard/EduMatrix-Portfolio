@@ -36,7 +36,6 @@ const sendEmail = async (to, subject, templateName, data) => {
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log('Email elküldve:', info.response);
     return info;
   } catch (error) {
     console.error('Email küldési hiba:', error);
