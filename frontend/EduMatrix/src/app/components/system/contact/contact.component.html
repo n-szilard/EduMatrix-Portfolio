@@ -1,3 +1,4 @@
+<p-toast></p-toast>
 <app-header></app-header>
 
 <main class="contact-page px-3 md:px-4 pb-5">
@@ -65,29 +66,32 @@
                     <form class="contact-form grid" novalidate>
                         <div class="col-12 md:col-6">
                             <label for="contactName" class="block mb-2 text-sm text-color-secondary">Név</label>
-                            <input id="contactName" pInputText type="text" class="w-full" placeholder="Teljes név" />
+                            <input id="contactName" pInputText type="text" class="w-full" placeholder="Teljes név"
+                                name="name" [(ngModel)]="mailDto.name" />
                         </div>
 
                         <div class="col-12 md:col-6">
                             <label for="contactEmail" class="block mb-2 text-sm text-color-secondary">Email cím</label>
                             <input id="contactEmail" pInputText type="email" class="w-full"
-                                placeholder="pelda@email.hu" />
+                                placeholder="pelda@email.hu" name="email" [(ngModel)]="mailDto.email" />
                         </div>
 
                         <div class="col-12">
                             <label for="contactSubject" class="block mb-2 text-sm text-color-secondary">Tárgy</label>
                             <input id="contactSubject" pInputText type="text" class="w-full"
-                                placeholder="Miben segíthetünk?" />
+                                placeholder="Miben segíthetünk?" name="subject" [(ngModel)]="mailDto.subject" />
                         </div>
 
                         <div class="col-12">
                             <label for="contactMessage" class="block mb-2 text-sm text-color-secondary">Üzenet</label>
                             <textarea id="contactMessage" class="w-full p-inputtext p-component" rows="6"
-                                placeholder="Írd le röviden a kérdésed vagy igényed..."></textarea>
+                                placeholder="Írd le röviden a kérdésed vagy igényed..." name="message"
+                                [(ngModel)]="mailDto.message"></textarea>
                         </div>
 
                         <div class="col-12 pt-1">
-                            <p-button type="submit" label="Üzenet küldése" icon="pi pi-send"></p-button>
+                            <p-button (onClick)="sendMail()" label="Üzenet küldése" icon="pi pi-send"
+                                [loading]="isSending" [disabled]="isSending"></p-button>
                         </div>
                     </form>
                 </p-card>

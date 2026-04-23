@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; }
+        .header { background-color: #2196F3; color: white; padding: 20px; text-align: center; border-radius: 5px; }
+        .content { background-color: white; padding: 20px; border-radius: 5px; margin-top: 10px; }
+        .message-box { background-color: #f0f0f0; padding: 15px; border-left: 4px solid #2196F3; margin: 15px 0; }
+        .footer { text-align: center; color: #999; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Új üzenet az EduMatrix kapcsolatból</h1>
+        </div>
+        
+        <div class="content">
+            <p><strong>Felhasználó adatai:</strong></p>
+            <ul>
+                <li><strong>Név:</strong> <%= name %></li>
+                <li><strong>Email:</strong> <%= email %></li>
+                <li><strong>Tárgy:</strong> <%= subject %></li>
+            </ul>
+            
+            <p><strong>Üzenet:</strong></p>
+            <div class="message-box">
+                <p><%= message %></p>
+            </div>
+            
+            <p><em>Válaszolj az <%= email %> címre.</em></p>
+        </div>
+        
+        <div class="footer">
+            <p>Automatikus üzenet - 2026 EduMatrix</p>
+        </div>
+    </div>
+</body>
+</html>
