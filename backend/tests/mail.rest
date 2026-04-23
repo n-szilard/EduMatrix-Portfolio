@@ -1,0 +1,10 @@
+### POST email küldés
+POST http://localhost:4000/api/mail/contact
+Content-Type: application/json
+
+{
+  "name": "Pálinkás Andor",
+  "email": "palinkasandor220@gmail.com",
+  "subject": "Bejelentkezési probléma",
+  "message": "Nem tudok bejelentkezni..."
+}
