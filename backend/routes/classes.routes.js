@@ -97,6 +97,12 @@ router.get('/:id/students', authenticateToken, authorizeRoles(['admin', 'teacher
 
     const students = await Student.findAll({
       where: { class_id: classId },
+      include: [
+        {
+          model: User,
+          attributes: ['id', 'full_name', 'username', 'email'],
+        },
+      ],
     });
 
     return res.json(students);
