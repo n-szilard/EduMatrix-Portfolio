@@ -34,7 +34,6 @@ export interface CreateUserPayload {
   email: string;
   full_name: string;
   password: string;
-  role: RoleName;
 }
 
 export interface UpdateUserPayload {

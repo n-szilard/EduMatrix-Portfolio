@@ -205,7 +205,6 @@ router.post(
     body('username').trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
     body('full_name').trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
     body('password').isLength({ min: 8 }).withMessage('A jelszónak legalább 8 karakter hosszúnak kell lennie.'),
-    body('role').trim().notEmpty().withMessage('Szerepkör megadása kötelező.'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -214,7 +213,7 @@ router.post(
     }
 
     try {
-      const { username, email, full_name, password, role } = req.body;
+      const { username, email, full_name, password } = req.body;
 
       const existingUsername = await User.findOne({ where: { username } });
       if (existingUsername) {
@@ -225,9 +224,9 @@ router.post(
         return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
       }
 
-      const resolvedRole = await resolveRoleInput(role);
-      if (!resolvedRole) {
-        return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
+      const pendingRole = await resolveRoleInput('pending');
+      if (!pendingRole) {
+        return res.status(500).json({ message: 'Szerverhiba: pending szerepkör nem található.' });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -238,7 +237,7 @@ router.post(
         email,
         full_name,
         password_hash,
-        role_id: resolvedRole.id,
+        role_id: pendingRole.id,
       });
 
       const createdWithRole = await User.findByPk(created.id, {
