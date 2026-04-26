@@ -55,6 +55,12 @@ export interface ChangePasswordPayload {
   newPassword: string;
 }
 
+export interface UpdateMyProfilePayload {
+  username?: string;
+  email?: string;
+  full_name?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -125,5 +131,11 @@ export class UserService {
       payload,
       { headers: this.authHeaders() }
     );
+  }
+
+  updateMyProfile(payload: UpdateMyProfilePayload): Observable<UserDto> {
+    return this.http.put<UserDto>(`${this.apiBaseUrl}/users/me`, payload, {
+      headers: this.authHeaders(),
+    });
   }
 }

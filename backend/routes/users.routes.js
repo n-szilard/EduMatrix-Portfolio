@@ -254,6 +254,73 @@ router.post(
   }
 );
 
+/**
+ * Saját profil adatainak módosítása (bejelentkezett user)
+ * PUT /api/users/me
+ * body: { username?: string, email?: string, full_name?: string }
+ */
+router.put(
+  '/me',
+  authenticateToken,
+  [
+    body('email').optional().isEmail().withMessage('Érvénytelen email cím.').normalizeEmail(),
+    body('username').optional().trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
+    body('full_name').optional().trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Nincs bejelentkezett felhasználó.' });
+      }
+
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'Felhasználó nem található.' });
+      }
+
+      const { username, email, full_name } = req.body;
+
+      if (username && username !== user.username) {
+        const existingUsername = await User.findOne({ where: { username } });
+        if (existingUsername && existingUsername.id !== user.id) {
+          return res.status(409).json({ message: 'Ez a felhasználónév már foglalt.' });
+        }
+        user.username = username;
+      }
+
+      if (email && email !== user.email) {
+        const existingEmail = await User.findOne({ where: { email } });
+        if (existingEmail && existingEmail.id !== user.id) {
+          return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
+        }
+        user.email = email;
+      }
+
+      if (typeof full_name === 'string') {
+        user.full_name = full_name;
+      }
+
+      await user.save();
+
+      const updated = await User.findByPk(user.id, {
+        attributes: ['id', 'username', 'email', 'full_name', 'role_id'],
+        include: [{ model: Role, attributes: ['id', 'name'] }],
+      });
+
+      return res.json(toUserDto(updated));
+    } catch (error) {
+      console.error('User self update hiba:', error.message);
+      return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
+    }
+  }
+);
+
 // PUT /api/users/:id  (csak admin)
 router.put(
   '/:id',
