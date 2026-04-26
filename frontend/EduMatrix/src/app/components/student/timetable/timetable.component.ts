@@ -44,6 +44,9 @@ export class TimetableComponent implements OnInit {
     { label: 'Szombat', value: 'Saturday' },
     { label: 'Vasárnap', value: 'Sunday' },
   ];
+  visibleDays: Array<{ label: string; value: DayOfWeek }> = this.days.filter(
+    (day) => day.value !== 'Saturday' && day.value !== 'Sunday'
+  );
 
   readonly lessonNumbers = Array.from({ length: 10 }, (_, index) => index);
 
@@ -69,19 +72,19 @@ export class TimetableComponent implements OnInit {
   }
 
   get mobileDay(): DayOfWeek {
-    return this.days[this.mobileDayIndex]?.value ?? 'Monday';
+    return this.visibleDays[this.mobileDayIndex]?.value ?? 'Monday';
   }
 
   get mobileDayLabel(): string {
-    return this.days[this.mobileDayIndex]?.label ?? 'Hétfő';
+    return this.visibleDays[this.mobileDayIndex]?.label ?? 'Hétfő';
   }
 
   previousDay(): void {
-    this.mobileDayIndex = (this.mobileDayIndex + this.days.length - 1) % this.days.length;
+    this.mobileDayIndex = (this.mobileDayIndex + this.visibleDays.length - 1) % this.visibleDays.length;
   }
 
   nextDay(): void {
-    this.mobileDayIndex = (this.mobileDayIndex + 1) % this.days.length;
+    this.mobileDayIndex = (this.mobileDayIndex + 1) % this.visibleDays.length;
   }
 
   mobileEntries(lessonNumber: number): TimetableRow[] {
@@ -95,7 +98,7 @@ export class TimetableComponent implements OnInit {
   private setInitialMobileDay(): void {
     const map = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const today = map[new Date().getDay()] as DayOfWeek;
-    const index = this.days.findIndex((day) => day.value === today);
+    const index = this.visibleDays.findIndex((day) => day.value === today);
     this.mobileDayIndex = index >= 0 ? index : 0;
   }
 
@@ -105,6 +108,7 @@ export class TimetableComponent implements OnInit {
 
   private rebuildGridData(): void {
     const grouped = new Map<string, TimetableRow[]>();
+    const selectedDay = this.visibleDays[this.mobileDayIndex]?.value ?? 'Monday';
 
     for (const row of this.rows) {
       const key = this.getEntryKey(row.day_of_week, row.lesson_number);
@@ -116,10 +120,22 @@ export class TimetableComponent implements OnInit {
       }
     }
 
+    const saturdayHasEntries = this.rows.some((row) => row.day_of_week === 'Saturday');
+    const sundayHasEntries = this.rows.some((row) => row.day_of_week === 'Sunday');
+
+    this.visibleDays = this.days.filter((day) => {
+      if (day.value === 'Saturday') return saturdayHasEntries;
+      if (day.value === 'Sunday') return sundayHasEntries;
+      return true;
+    });
+
+    const nextMobileIndex = this.visibleDays.findIndex((day) => day.value === selectedDay);
+    this.mobileDayIndex = nextMobileIndex >= 0 ? nextMobileIndex : 0;
+
     this.entriesByDayAndLesson = grouped;
     this.gridRows = this.lessonNumbers.map((lessonNumber) => ({
       lessonNumber,
-      cells: this.days.map((day) => ({
+      cells: this.visibleDays.map((day) => ({
         day: day.value,
         lessonNumber,
         entries: grouped.get(this.getEntryKey(day.value, lessonNumber)) ?? [],
