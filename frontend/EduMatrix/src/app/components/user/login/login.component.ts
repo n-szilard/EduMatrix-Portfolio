@@ -75,12 +75,34 @@ export class LoginComponent {
           this.router.navigate(['/']);
         },
         error: (err) => {
-          this.errorMessage = err.error?.message || 'Bejelentkezési hiba.';
+          this.errorMessage = this.resolveLoginErrorMessage(err);
           this.loading = false;
         },
         complete: () => {
           this.loading = false;
         }
       });
+  }
+
+  private resolveLoginErrorMessage(err: any): string {
+    const backendMessage = err?.error?.message;
+
+    if (typeof backendMessage === 'string' && backendMessage.trim()) {
+      return backendMessage;
+    }
+
+    const validationErrors = err?.error?.errors;
+    if (Array.isArray(validationErrors) && validationErrors.length > 0) {
+      const firstError = validationErrors[0];
+      if (typeof firstError?.msg === 'string' && firstError.msg.trim()) {
+        return firstError.msg;
+      }
+    }
+
+    if (err?.status === 401) {
+      return 'Hibás felhasználónév vagy jelszó.';
+    }
+
+    return 'Bejelentkezési hiba.';
   }
 }

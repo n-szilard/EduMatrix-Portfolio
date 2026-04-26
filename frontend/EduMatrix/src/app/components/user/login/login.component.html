@@ -7,7 +7,7 @@
     </div>
 
     <form [formGroup]="loginForm" (ngSubmit)="login()">
-
+      <p-message *ngIf="errorMessage" severity="error" [text]="errorMessage" styleClass="full-width mb-3"></p-message>
 
       <div class="field">
         <label>Felhasználónév</label>
