@@ -205,7 +205,6 @@ router.post(
     body('username').trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
     body('full_name').trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
     body('password').isLength({ min: 8 }).withMessage('A jelszónak legalább 8 karakter hosszúnak kell lennie.'),
-    body('role').trim().notEmpty().withMessage('Szerepkör megadása kötelező.'),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -214,7 +213,7 @@ router.post(
     }
 
     try {
-      const { username, email, full_name, password, role } = req.body;
+      const { username, email, full_name, password } = req.body;
 
       const existingUsername = await User.findOne({ where: { username } });
       if (existingUsername) {
@@ -225,9 +224,9 @@ router.post(
         return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
       }
 
-      const resolvedRole = await resolveRoleInput(role);
-      if (!resolvedRole) {
-        return res.status(400).json({ message: 'Érvénytelen szerepkör.' });
+      const pendingRole = await resolveRoleInput('pending');
+      if (!pendingRole) {
+        return res.status(500).json({ message: 'Szerverhiba: pending szerepkör nem található.' });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -238,7 +237,7 @@ router.post(
         email,
         full_name,
         password_hash,
-        role_id: resolvedRole.id,
+        role_id: pendingRole.id,
       });
 
       const createdWithRole = await User.findByPk(created.id, {
@@ -249,6 +248,73 @@ router.post(
       return res.status(201).json(toUserDto(createdWithRole));
     } catch (error) {
       console.error('User create hiba:', error.message);
+      return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
+    }
+  }
+);
+
+/**
+ * Saját profil adatainak módosítása (bejelentkezett user)
+ * PUT /api/users/me
+ * body: { username?: string, email?: string, full_name?: string }
+ */
+router.put(
+  '/me',
+  authenticateToken,
+  [
+    body('email').optional().isEmail().withMessage('Érvénytelen email cím.').normalizeEmail(),
+    body('username').optional().trim().isLength({ min: 3, max: 30 }).withMessage('A felhasználónévnek 3 és 30 karakter közé kell esnie.'),
+    body('full_name').optional().trim().isLength({ min: 1, max: 120 }).withMessage('Teljes név megadása kötelező.'),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    try {
+      const userId = req.user?.id;
+      if (!userId) {
+        return res.status(401).json({ message: 'Nincs bejelentkezett felhasználó.' });
+      }
+
+      const user = await User.findByPk(userId);
+      if (!user) {
+        return res.status(404).json({ message: 'Felhasználó nem található.' });
+      }
+
+      const { username, email, full_name } = req.body;
+
+      if (username && username !== user.username) {
+        const existingUsername = await User.findOne({ where: { username } });
+        if (existingUsername && existingUsername.id !== user.id) {
+          return res.status(409).json({ message: 'Ez a felhasználónév már foglalt.' });
+        }
+        user.username = username;
+      }
+
+      if (email && email !== user.email) {
+        const existingEmail = await User.findOne({ where: { email } });
+        if (existingEmail && existingEmail.id !== user.id) {
+          return res.status(409).json({ message: 'Ez az email cím már regisztrált.' });
+        }
+        user.email = email;
+      }
+
+      if (typeof full_name === 'string') {
+        user.full_name = full_name;
+      }
+
+      await user.save();
+
+      const updated = await User.findByPk(user.id, {
+        attributes: ['id', 'username', 'email', 'full_name', 'role_id'],
+        include: [{ model: Role, attributes: ['id', 'name'] }],
+      });
+
+      return res.json(toUserDto(updated));
+    } catch (error) {
+      console.error('User self update hiba:', error.message);
       return res.status(500).json({ message: 'Szerverhiba: ' + error.message });
     }
   }

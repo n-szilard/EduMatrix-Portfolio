@@ -11,6 +11,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../services/auth.service';
 import { UserService } from '../../../services/user.service';
+import { StudentNavbarComponent } from '../../student/student-navbar/student-navbar.component';
 
 @Component({
   selector: 'app-profile',
@@ -25,6 +26,7 @@ import { UserService } from '../../../services/user.service';
     TagModule,
     AvatarModule,
     DividerModule,
+    StudentNavbarComponent,
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',
@@ -78,11 +80,51 @@ export class ProfileComponent {
   }
 
   mentesek(): void {
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Sikeres mentés',
-      detail: 'Minden módosítás sikeresen mentve!',
-      life: 3000,
+    const fullName = `${this.vezeteknev} ${this.keresztnev}`.replace(/\s+/g, ' ').trim();
+    if (!fullName || !this.email.trim() || !this.username.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Hiányzó adatok',
+        detail: 'A név, email és felhasználónév kitöltése kötelező.',
+        life: 3000,
+      });
+      return;
+    }
+
+    this.userService.updateMyProfile({
+      full_name: fullName,
+      email: this.email.trim(),
+      username: this.username.trim(),
+    }).subscribe({
+      next: (updatedUser) => {
+        this.authService.updateStoredUser(updatedUser);
+
+        const parts = (updatedUser.full_name ?? '').trim().split(/\s+/).filter(Boolean);
+        this.vezeteknev = parts[0] ?? '';
+        this.keresztnev = parts.slice(1).join(' ') ?? '';
+        this.email = updatedUser.email ?? '';
+        this.username = updatedUser.username ?? '';
+        this.role = updatedUser.role ?? this.role;
+
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Sikeres mentés',
+          detail: 'A profil adatai sikeresen mentve lettek.',
+          life: 3000,
+        });
+      },
+      error: (err) => {
+        const msg = err?.error?.message
+          || (Array.isArray(err?.error?.errors) ? err.error.errors.map((e: any) => e.msg).join(' ') : null)
+          || 'Nem sikerült menteni a profil adatokat.';
+
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Hiba',
+          detail: msg,
+          life: 4000,
+        });
+      }
     });
   }
 

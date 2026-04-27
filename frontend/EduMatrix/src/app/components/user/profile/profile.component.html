@@ -2,27 +2,31 @@
 
 <div class="profile-page">
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <div class="flex align-items-center gap-2">
-      <div class="logo-icon">
-        <i class="pi pi-graduation-cap"></i>
-      </div>
-      <span class="logo-text">Edu<span class="text-primary">Matrix</span></span>
-    </div>
-
-    <div class="flex align-items-center gap-3">
-      <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary" />
-      <p-divider layout="vertical" styleClass="mx-1" />
+  @if (role === 'student') {
+    <app-student-navbar></app-student-navbar>
+  } @else {
+    <!-- NAVBAR -->
+    <nav class="navbar">
       <div class="flex align-items-center gap-2">
-        <div class="user-info">
-          <span>{{ vezeteknev }} {{ keresztnev }}</span>
-          <small>{{ role }}</small>
+        <div class="logo-icon">
+          <i class="pi pi-graduation-cap"></i>
         </div>
-        <p-avatar label="TTS" shape="circle" styleClass="nav-avatar" />
+        <span class="logo-text">Edu<span class="text-primary">Matrix</span></span>
       </div>
-    </div>
-  </nav>
+
+      <div class="flex align-items-center gap-3">
+        <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary" />
+        <p-divider layout="vertical" styleClass="mx-1" />
+        <div class="flex align-items-center gap-2">
+          <div class="user-info">
+            <span>{{ vezeteknev }} {{ keresztnev }}</span>
+            <small>{{ role }}</small>
+          </div>
+          <p-avatar label="TTS" shape="circle" styleClass="nav-avatar" />
+        </div>
+      </div>
+    </nav>
+  }
 
   <!-- FŐ TARTALOM -->
   <div class="content">
@@ -38,7 +42,6 @@
   <p>{{ role }} • EduMatrix Intézmény</p>
         <div class="flex gap-2 mt-2">
           <p-tag value="AKTÍV FIÓK" severity="success" [rounded]="true" />
-          <p-tag value="Utolsó belépés: Ma 08:42" [rounded]="true" styleClass="last-login-tag" />
         </div>
       </div>
     </div>

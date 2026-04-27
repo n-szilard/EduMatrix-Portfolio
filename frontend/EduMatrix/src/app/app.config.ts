@@ -13,7 +13,10 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(),
     providePrimeNG({
       theme: {
-        preset: EduMatrixPreset
+        preset: EduMatrixPreset,
+        options: {
+          darkModeSelector: '.app-dark'
+        }
       }
     })
   ]

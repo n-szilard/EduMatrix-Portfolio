@@ -211,14 +211,8 @@ export class UsersComponent implements OnInit {
       username:  [user?.username  ?? '', [Validators.required, Validators.minLength(3)]],
       email:     [user?.email     ?? '', [Validators.required, Validators.email]],
       full_name: [user?.full_name ?? '', Validators.required],
-      role:      [user?.role      ?? '', Validators.required],
       password:  ['', this.isEditMode() ? [] : [Validators.required, Validators.minLength(8)]],
     });
-
-    // Aktivált felhasználónál a szerepkör ne legyen szerkeszthető
-    if (this.isEditMode() && user && user.role !== 'pending') {
-      this.form.get('role')?.disable();
-    }
   }
 
   // Párbeszédablak
@@ -252,53 +246,10 @@ export class UsersComponent implements OnInit {
     const val = this.form.getRawValue();
 
     if (this.isEditMode() && this.editingUserId) {
-      const originalUser = this.users().find(u => u.id === this.editingUserId) || null;
-      const originalRole = originalUser?.role ?? null;
-      const targetRole = val.role as RoleName;
-      const shouldActivatePending =
-        originalRole === 'pending' &&
-        (targetRole === 'student' || targetRole === 'teacher');
-
-      // Aktiválás után szerepkör ne legyen módosítható
-      if (originalRole && originalRole !== 'pending' && targetRole !== originalRole) {
-        this.submitting.set(false);
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Nem módosítható',
-          detail: 'Aktiválás után a szerepkör már nem módosítható.',
-        });
-        return;
-      }
-
-      if (shouldActivatePending) {
-        this.userService.activatePending(this.editingUserId, { role: targetRole })
-          .pipe(finalize(() => this.submitting.set(false)))
-          .subscribe({
-            next: () => {
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Felhasználó aktiválva',
-                detail: `${val.username} szerepköre: ${this.roleLabelMap[targetRole]}.`,
-              });
-              this.closeDialog();
-              this.loadUsers();
-            },
-            error: (err) => {
-              this.messageService.add({
-                severity: 'error',
-                summary: 'Hiba',
-                detail: err.error?.message || 'Nem sikerült aktiválni a felhasználót.',
-              });
-            },
-          });
-        return;
-      }
-
       const payload: UpdateUserPayload = {
         username: val.username,
         email: val.email,
         full_name: val.full_name,
-        ...(originalRole === 'pending' ? { role: val.role } : {}),
         ...(val.password ? { password: val.password } : {}),
       };
 
@@ -321,7 +272,6 @@ export class UsersComponent implements OnInit {
         email: val.email,
         full_name: val.full_name,
         password: val.password,
-        role: val.role,
       };
 
       this.userService.createUser(payload)
@@ -338,15 +288,6 @@ export class UsersComponent implements OnInit {
           },
         });
     }
-  }
-
-  canChangeRoleInDialog(): boolean {
-    if (!this.isEditMode() || !this.editingUserId) {
-      return true;
-    }
-
-    const editingUser = this.users().find(u => u.id === this.editingUserId);
-    return editingUser?.role === 'pending';
   }
 
   // Gyors szerepkör váltás (aktiválás)
@@ -434,8 +375,4 @@ export class UsersComponent implements OnInit {
     return !!(ctrl?.invalid && ctrl.touched);
   }
 
-  /** Ismeretlen option name biztonságos castolása */
-  asRoleName(name: unknown): RoleName {
-    return name as RoleName;
-  }
 }

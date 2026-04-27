@@ -177,8 +177,10 @@
 				<div *ngFor="let student of classStudents()"
 					class="flex align-items-center justify-content-between border-round-md surface-ground p-2">
 					<div class="text-sm">
-						<div><strong>Student:</strong> {{ student.id }}</div>
-						<div class="text-color-secondary"><strong>User:</strong> {{ student.user_id }}</div>
+						<div><strong>Név:</strong> {{ student.User?.full_name || student.User?.username || student.user_id }}</div>
+						<div class="text-color-secondary" *ngIf="student.User?.username">
+							<strong>Felhasználónév:</strong> {{ student.User?.username }}
+						</div>
 					</div>
 					<p-button label="Eltávolítás" icon="pi pi-times" severity="danger" [text]="true"
 						(onClick)="removeStudent(student.id)" />

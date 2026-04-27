@@ -34,7 +34,6 @@ export interface CreateUserPayload {
   email: string;
   full_name: string;
   password: string;
-  role: RoleName;
 }
 
 export interface UpdateUserPayload {
@@ -53,6 +52,12 @@ export interface ActivatePendingPayload {
 export interface ChangePasswordPayload {
   currentPassword: string;
   newPassword: string;
+}
+
+export interface UpdateMyProfilePayload {
+  username?: string;
+  email?: string;
+  full_name?: string;
 }
 
 @Injectable({
@@ -125,5 +130,11 @@ export class UserService {
       payload,
       { headers: this.authHeaders() }
     );
+  }
+
+  updateMyProfile(payload: UpdateMyProfilePayload): Observable<UserDto> {
+    return this.http.put<UserDto>(`${this.apiBaseUrl}/users/me`, payload, {
+      headers: this.authHeaders(),
+    });
   }
 }

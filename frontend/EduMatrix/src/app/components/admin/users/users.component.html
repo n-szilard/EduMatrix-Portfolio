@@ -275,39 +275,6 @@
       }
     </div>
 
-    <!-- Role -->
-    <div class="flex flex-column gap-2">
-      <label class="text-color font-medium text-sm">Szerepkör <span class="text-red-500">*</span></label>
-      <p-select
-        formControlName="role"
-        [options]="roleOptions()"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Válasszon szerepkört"
-        styleClass="w-full"
-        [appendTo]="'body'"
-        [disabled]="isEditMode() && !canChangeRoleInDialog()"
-        [class.ng-invalid]="isInvalid('role')"
-        [class.ng-dirty]="isInvalid('role')"
-      >
-        <ng-template #selectedItem let-opt>
-          <div class="flex align-items-center gap-2" *ngIf="opt">
-            <i [class]="roleIconMap[asRoleName(opt.name)]"></i>
-            <span>{{ opt.label }}</span>
-          </div>
-        </ng-template>
-        <ng-template #item let-opt>
-          <div class="flex align-items-center gap-2">
-            <i [class]="roleIconMap[asRoleName(opt.name)]"></i>
-            <span>{{ opt.label }}</span>
-          </div>
-        </ng-template>
-      </p-select>
-      @if (isInvalid('role')) {
-        <small class="text-red-500">Kérjük válasszon szerepkört.</small>
-      }
-    </div>
-
     <!-- Password -->
     <div class="flex flex-column gap-2">
       <label class="text-color font-medium text-sm">

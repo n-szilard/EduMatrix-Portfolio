@@ -102,6 +102,25 @@ export class AuthService {
     return user?.role || null;
   }
 
+  // Lokálisan mentett felhasználói adatok frissítése profil mentés után.
+  updateStoredUser(user: UserDto): void {
+    const hasLocalToken = localStorage.getItem(this.tokenKey) !== null;
+    const hasSessionToken = sessionStorage.getItem(this.tokenKey) !== null;
+
+    if (hasLocalToken) {
+      localStorage.setItem(this.userKey, JSON.stringify(user));
+    }
+    if (hasSessionToken) {
+      sessionStorage.setItem(this.userKey, JSON.stringify(user));
+    }
+
+    if (!hasLocalToken && !hasSessionToken) {
+      sessionStorage.setItem(this.userKey, JSON.stringify(user));
+    }
+
+    this.currentUserSubject.next(user);
+  }
+
   // Token lejárati időzítő beállítása.
   private setupTokenExpirationTimer(token: string): void {
     try {
