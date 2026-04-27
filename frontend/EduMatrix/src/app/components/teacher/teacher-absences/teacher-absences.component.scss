@@ -1,0 +1,242 @@
+.teacher-absences {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.hero {
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  padding: 1rem 1.2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  background:
+    radial-gradient(circle at top right, rgba(19, 127, 236, 0.22), transparent 38%),
+    rgba(15, 23, 42, 0.8);
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  letter-spacing: -0.03em;
+}
+
+.hero p {
+  margin: 0.4rem 0 0;
+  color: #94a3b8;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.stat-card {
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.78);
+}
+
+.stat-card small {
+  display: block;
+  color: #93c5fd;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.stat-card strong {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 2rem;
+}
+
+.stat-card--good small {
+  color: #22c55e;
+}
+
+.stat-card--bad small {
+  color: #ef4444;
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(320px, 1fr);
+  gap: 1rem;
+}
+
+.panel-card {
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.78);
+  padding: 1rem;
+}
+
+.panel-card h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.15rem;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.8rem;
+}
+
+.field-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.field-grid span {
+  color: #cbd5e1;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.field-grid input {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(15, 23, 42, 0.86);
+  color: #e2e8f0;
+  border-radius: 12px;
+  padding: 0.65rem 0.7rem;
+}
+
+.panel-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.selection-meta {
+  color: #93c5fd;
+  font-size: 0.85rem;
+}
+
+.lessons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.lesson-item {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 0.65rem 0.75rem;
+  background: rgba(15, 23, 42, 0.6);
+  color: #e2e8f0;
+}
+
+.lesson-item:hover {
+  border-color: rgba(19, 127, 236, 0.55);
+}
+
+.lesson-item.is-selected {
+  border-color: rgba(19, 127, 236, 0.95);
+  background: rgba(19, 127, 236, 0.16);
+}
+
+.lesson-item__left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.lesson-item strong {
+  display: block;
+}
+
+.lesson-item small {
+  color: #94a3b8;
+}
+
+.empty {
+  padding: 1rem;
+  border: 1px dashed rgba(148, 163, 184, 0.28);
+  border-radius: 12px;
+  color: #94a3b8;
+}
+
+.table-panel {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.table-header h2 {
+  margin: 0;
+}
+
+.table-header small {
+  color: #94a3b8;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.table-wrap :global(.p-datatable-table),
+.table-wrap .p-datatable-table {
+  min-width: 640px;
+}
+
+.error-box {
+  margin: 0;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  background: rgba(127, 29, 29, 0.35);
+  color: #fecaca;
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+}
+
+:host ::ng-deep {
+  .p-dropdown,
+  .p-checkbox {
+    width: 100%;
+  }
+
+  .p-dropdown {
+    background: rgba(15, 23, 42, 0.86);
+    border-color: rgba(148, 163, 184, 0.26);
+    border-radius: 12px;
+  }
+
+  .p-dropdown .p-dropdown-label {
+    color: #e2e8f0;
+  }
+
+  .p-card .p-card-body {
+    padding: 1rem;
+  }
+
+  .p-datatable .p-datatable-thead > tr > th,
+  .p-datatable .p-datatable-tbody > tr > td {
+    background: rgba(15, 23, 42, 0.72);
+    border-color: rgba(148, 163, 184, 0.14);
+    color: #e2e8f0;
+  }
+}
+
+@media (max-width: 1024px) {
+  .picker-grid {
+    grid-template-columns: 1fr;
+  }
+}

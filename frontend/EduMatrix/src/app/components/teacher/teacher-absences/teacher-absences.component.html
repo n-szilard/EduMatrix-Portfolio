@@ -1,0 +1,153 @@
+<div class="teacher-absences">
+  <section class="hero">
+    <div class="hero__content">
+      <h1>Hiányzáskezelés</h1>
+      <p>Válassz osztályt, diákot és dátumot, majd jelöld ki az aznapi órákat, ahol hiányzott.</p>
+    </div>
+
+    <div class="hero__actions">
+      <p-button label="Frissítés" icon="pi pi-refresh" severity="secondary" [outlined]="true" (onClick)="reloadAll()"></p-button>
+    </div>
+  </section>
+
+  <section class="stats-grid">
+    <p-card styleClass="stat-card">
+      <small>Mulasztott órák</small>
+      <strong>{{ stats().total }}</strong>
+    </p-card>
+    <p-card styleClass="stat-card stat-card--good">
+      <small>Igazolt</small>
+      <strong>{{ stats().justified }}</strong>
+    </p-card>
+    <p-card styleClass="stat-card stat-card--bad">
+      <small>Igazolatlan</small>
+      <strong>{{ stats().unjustified }}</strong>
+    </p-card>
+  </section>
+
+  <section class="picker-grid">
+    <p-card styleClass="panel-card">
+      <h2>1. Alapadatok kiválasztása</h2>
+
+      <div class="field-grid">
+        <label>
+          <span>Osztály</span>
+          <p-dropdown
+            [options]="classOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [showClear]="true"
+            placeholder="Válassz osztályt"
+            [ngModel]="selectedClassId()"
+            (ngModelChange)="onClassChange($event)"
+          ></p-dropdown>
+        </label>
+
+        <label>
+          <span>Diák</span>
+          <p-dropdown
+            [options]="studentOptions()"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            [showClear]="true"
+            placeholder="Válassz diákot"
+            [disabled]="!selectedClassId()"
+            [ngModel]="selectedStudentId()"
+            (ngModelChange)="onStudentChange($event)"
+          ></p-dropdown>
+        </label>
+
+        <label>
+          <span>Dátum</span>
+          <input
+            type="date"
+            [ngModel]="selectedDate()"
+            (ngModelChange)="onDateChange($event)"
+          />
+        </label>
+      </div>
+
+      <div class="panel-actions">
+        <p-button
+          label="Aznapi órák betöltése"
+          icon="pi pi-calendar"
+          [disabled]="!readyToLoadLessons()"
+          [loading]="loadingLessons()"
+          (onClick)="loadLessonsForDay()"
+        ></p-button>
+      </div>
+    </p-card>
+
+    <p-card styleClass="panel-card">
+      <h2>2. Aznapi órák kiválasztása</h2>
+
+      @if (dayLessons().length === 0) {
+        <div class="empty">Nincs kiválasztott óra. Töltsd be az aznapi órákat.</div>
+      } @else {
+        <div class="lessons-list">
+          @for (lesson of dayLessons(); track lesson.timetable_id) {
+            <button type="button" class="lesson-item" [class.is-selected]="lessonChecked(lesson.timetable_id)" (click)="toggleLesson(lesson.timetable_id)">
+              <div class="lesson-item__left">
+                <p-checkbox [binary]="true" [ngModel]="lessonChecked(lesson.timetable_id)" [disabled]="false"></p-checkbox>
+                <div>
+                  <strong>{{ lesson.lesson_number }}. óra - {{ lesson.subject_name }}</strong>
+                  <small>{{ lesson.room_number }} terem</small>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      }
+
+      <div class="panel-actions">
+        <span class="selection-meta">Kijelölt órák: {{ selectedLessonCount() }}</span>
+        <p-button
+          label="Hiányzás mentése"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="selectedLessonCount() === 0 || !selectedStudentId()"
+          (onClick)="saveAbsenceSelection()"
+        ></p-button>
+      </div>
+    </p-card>
+  </section>
+
+  <section class="panel-card table-panel">
+    <div class="table-header">
+      <h2>Részletes mulasztási napló</h2>
+      <small>Napi bontásban a kiválasztott szűrőkkel</small>
+    </div>
+
+    <div class="table-wrap">
+      <p-table [value]="absences()">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Dátum</th>
+            <th>Diák</th>
+            <th>Tantárgy</th>
+            <th>Osztály</th>
+            <th>Státusz</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-row>
+          <tr>
+            <td>{{ row.date }}</td>
+            <td>{{ row.student_name }}</td>
+            <td>{{ row.subject_name }}</td>
+            <td>{{ row.class_name }}</td>
+            <td>
+              <p-tag [value]="row.justified ? 'Igazolt' : 'Igazolatlan'" [severity]="statusSeverity(row.justified)"></p-tag>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </section>
+
+  @if (error()) {
+    <p class="error-box">{{ error() }}</p>
+  }
+</div>

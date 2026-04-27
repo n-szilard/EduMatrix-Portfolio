@@ -23,6 +23,7 @@ import { StudentLayoutComponent } from './components/student/layout/student-layo
 import { AboutComponent } from './components/system/about/about.component';
 import { FeaturesComponent } from './components/system/features/features.component';
 import { ContactComponent } from './components/system/contact/contact.component';
+import { TeacherAbsencesComponent } from './components/teacher/teacher-absences/teacher-absences.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -71,6 +72,7 @@ export const routes: Routes = [
             { path: 'dashboard', component: StudentDashboardComponent },
             { path: 'grades', component: TeacherGradesComponent },
             { path: 'notes', component: NotesComponent },
+            { path: 'absences', component: TeacherAbsencesComponent },
 
             { path: 'timetable', component: StudentTimetableComponent },
         ],
