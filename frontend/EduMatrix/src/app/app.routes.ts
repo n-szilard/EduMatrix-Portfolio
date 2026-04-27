@@ -24,6 +24,8 @@ import { AboutComponent } from './components/system/about/about.component';
 import { FeaturesComponent } from './components/system/features/features.component';
 import { ContactComponent } from './components/system/contact/contact.component';
 import { TeacherAbsencesComponent } from './components/teacher/teacher-absences/teacher-absences.component';
+import { TeacherLayoutComponent } from './components/teacher/layout/teacher-layout.component';
+import { TeacherDashboardComponent } from './components/teacher/teacher-dashboard/teacher-dashboard.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -61,18 +63,21 @@ export const routes: Routes = [
             { path: 'timetable', component: StudentTimetableComponent },
             { path: 'grades', component: GradesComponent },
             { path: 'notes', component: StudentNotesComponent },
+            { path: 'profile', component: ProfileComponent },
 
         ],
     },
     {
         path: 'teacher',
         canActivate: [roleGuard(['teacher', 'admin'])],
+        component: TeacherLayoutComponent,
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-            { path: 'dashboard', component: StudentDashboardComponent },
+            { path: 'dashboard', component: TeacherDashboardComponent },
             { path: 'grades', component: TeacherGradesComponent },
             { path: 'notes', component: NotesComponent },
             { path: 'absences', component: TeacherAbsencesComponent },
+            { path: 'profile', component: ProfileComponent },
 
             { path: 'timetable', component: StudentTimetableComponent },
         ],

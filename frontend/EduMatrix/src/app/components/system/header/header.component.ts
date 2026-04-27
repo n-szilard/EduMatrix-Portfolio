@@ -44,8 +44,7 @@ export class HeaderComponent {
     }
 
     if (role === 'teacher') {
-      // TODO: ha lesz tanár dashboard route, ide kell irányítani
-      this.router.navigate(['/']);
+      this.router.navigate(['/teacher/dashboard']);
       return;
     }
 

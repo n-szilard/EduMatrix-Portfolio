@@ -68,6 +68,10 @@ export class LoginComponent {
             this.router.navigate(['/pending']);
             return;
           }
+          if (role === 'teacher') {
+            this.router.navigate(['/teacher/dashboard']);
+            return;
+          }
           if (role === 'student') {
             this.router.navigate(['/student/dashboard']);
             return;
