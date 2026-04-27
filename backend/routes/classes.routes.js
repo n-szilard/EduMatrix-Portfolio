@@ -1,6 +1,6 @@
 const express = require('express');
 const { authenticateToken, authorizeRoles } = require('../middlewares/auth');
-const { Class, Student, User } = require('../models');
+const { Class, Student, User, ClassSubject, Teacher } = require('../models');
 
 const router = express.Router();
 
@@ -19,6 +19,32 @@ router.post('/', authenticateToken, authorizeRoles(['admin']), async (req, res) 
 // GET összes osztály lekérése
 router.get('/', authenticateToken, authorizeRoles(['admin', 'teacher']), async (req, res) => {
   try {
+    if (req.user.role === 'teacher') {
+      const teacher = await Teacher.findOne({ where: { user_id: req.user.id } });
+      if (!teacher) {
+        return res.json([]);
+      }
+
+      const assignedCount = await ClassSubject.count({ where: { teacher_id: teacher.id } });
+
+      if (assignedCount > 0) {
+        const classes = await Class.findAll({
+          include: [
+            {
+              model: ClassSubject,
+              attributes: [],
+              where: { teacher_id: teacher.id },
+            },
+          ],
+          attributes: ['id', 'name'],
+          group: ['Class.id'],
+          order: [['name', 'ASC']],
+        });
+
+        return res.json(classes);
+      }
+    }
+
     const classes = await Class.findAll();
     res.json(classes);
   } catch (error) {

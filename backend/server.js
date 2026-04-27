@@ -18,6 +18,8 @@ app.use('/api/class-subjects', require('./routes/class-subjects.routes'));
 app.use('/api/timetables', require('./routes/timetables.routes'));
 app.use('/api/notes', require('./routes/notes.routes'));
 app.use('/api/mail', require('./routes/mail.routes'));
+app.use('/api/absences', require('./routes/absences.routes'));
+
 
 // DB sync + szerver indítás
 (async () => {
