@@ -1,0 +1,115 @@
+<section class="teacher-dashboard">
+  <header class="teacher-dashboard__header">
+    <div>
+      <h1>Üdv, {{ teacherName() }}!</h1>
+      <p>Itt látod a legfontosabb tanári összefoglalókat.</p>
+    </div>
+
+    <div class="teacher-dashboard__header-actions">
+      <p-tag value="Tanári felület" severity="info" [rounded]="true" />
+      <button pButton type="button" class="p-button-rounded" icon="pi pi-refresh" label="Frissítés" (click)="reload()"></button>
+    </div>
+  </header>
+
+  @if (loadError()) {
+    <p-card styleClass="teacher-dashboard__notice teacher-dashboard__notice--error">
+      <ng-template pTemplate="content">
+        <div class="teacher-dashboard__notice-inner">
+          <div>
+            <strong>Hiba</strong>
+            <div class="teacher-dashboard__notice-text">{{ loadError() }}</div>
+          </div>
+          <button pButton type="button" severity="secondary" [outlined]="true" icon="pi pi-refresh" label="Újrapróbálom" (click)="reload()"></button>
+        </div>
+      </ng-template>
+    </p-card>
+  }
+
+  @if (loading()) {
+    <p-card styleClass="teacher-dashboard__notice">
+      <ng-template pTemplate="content">
+        Betöltés folyamatban...
+      </ng-template>
+    </p-card>
+  } @else {
+    <div class="teacher-dashboard__summary">
+      @for (card of summaryCards(); track card.label) {
+        <div class="teacher-summary-card" [class]="card.tone">
+          <div class="teacher-summary-card__icon">
+            <i class="pi" [ngClass]="card.icon"></i>
+          </div>
+          <div class="teacher-summary-card__body">
+            <div class="teacher-summary-card__label">{{ card.label }}</div>
+            <div class="teacher-summary-card__value">{{ card.value }}</div>
+            <div class="teacher-summary-card__hint">{{ card.hint }}</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="teacher-dashboard__panels">
+      <p-card styleClass="teacher-dashboard__panel">
+        <ng-template pTemplate="header">
+          <div class="teacher-dashboard__panel-header">
+            <div>
+              <strong>Hiányzások aránya</strong>
+              <small>Igazolt vs. igazolatlan</small>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+          <div class="teacher-dashboard__chart">
+            <canvas #absenceChartCanvas></canvas>
+          </div>
+        </ng-template>
+      </p-card>
+
+      <p-card styleClass="teacher-dashboard__panel">
+        <ng-template pTemplate="header">
+          <div class="teacher-dashboard__panel-header">
+            <div>
+              <strong>Feljegyzések kategóriánként</strong>
+              <small>Összes feljegyzés megoszlása</small>
+            </div>
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+          <div class="teacher-dashboard__chart">
+            <canvas #notesChartCanvas></canvas>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <section class="teacher-dashboard__quick">
+      <div class="teacher-dashboard__section-title">
+        <h2>Gyors műveletek</h2>
+        <p>Ugrás a leggyakrabban használt oldalakra.</p>
+      </div>
+
+      <div class="teacher-dashboard__grid">
+        @for (link of quickLinks; track link.route) {
+          <p-card styleClass="teacher-dashboard__card">
+            <ng-template pTemplate="header">
+              <div class="teacher-dashboard__card-header">
+                <span class="teacher-dashboard__icon">
+                  <i class="pi" [ngClass]="link.icon"></i>
+                </span>
+                <div>
+                  <h3>{{ link.title }}</h3>
+                  <p>{{ link.description }}</p>
+                </div>
+              </div>
+            </ng-template>
+
+            <ng-template pTemplate="footer">
+              <a pButton type="button" class="p-button-rounded" [routerLink]="link.route" label="Megnyitás"></a>
+            </ng-template>
+          </p-card>
+        }
+      </div>
+    </section>
+  }
+</section>
