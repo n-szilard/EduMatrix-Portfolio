@@ -1,0 +1,67 @@
+<nav class="teacher-nav">
+  <div class="teacher-nav__inner">
+    <a class="teacher-nav__brand" routerLink="/teacher/dashboard" (click)="closeMenu()">
+      <span class="teacher-nav__brand-mark">
+        <i class="pi pi-briefcase"></i>
+      </span>
+      <span class="teacher-nav__brand-text">
+        <strong>EduMatrix</strong>
+        <small>Tanári felület</small>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      class="teacher-nav__toggle"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen"
+      aria-label="Menü megnyitása"
+    >
+      <i class="pi" [class.pi-bars]="!menuOpen" [class.pi-times]="menuOpen"></i>
+    </button>
+
+    <div class="teacher-nav__links" [class.is-open]="menuOpen">
+      <a routerLink="/teacher/dashboard" routerLinkActive="is-active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">
+        <i class="pi pi-home"></i>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/teacher/grades" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-book"></i>
+        <span>Jegyek</span>
+      </a>
+      <a routerLink="/teacher/notes" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-pencil"></i>
+        <span>Feljegyzések</span>
+      </a>
+      <a routerLink="/teacher/absences" routerLinkActive="is-active" (click)="closeMenu()">
+        <i class="pi pi-check-square"></i>
+        <span>Hiányzások</span>
+      </a>
+    </div>
+
+    <div class="teacher-nav__actions" [class.is-open]="menuOpen">
+      <a class="teacher-nav__home" routerLink="/" (click)="closeMenu()">
+        <i class="pi pi-globe"></i>
+        <span>Főoldal</span>
+      </a>
+
+      <a class="teacher-nav__profile" routerLink="/teacher/profile" (click)="closeMenu()">
+        <i class="pi pi-cog"></i>
+        <span>Beállítások</span>
+      </a>
+
+      <div class="teacher-nav__user">
+        <span class="teacher-nav__avatar">{{ userInitials }}</span>
+        <div class="teacher-nav__user-text">
+          <strong>{{ currentUser()?.full_name || currentUser()?.username || 'Tanár' }}</strong>
+          <small>Bejelentkezve</small>
+        </div>
+      </div>
+
+      <button type="button" class="teacher-nav__logout" (click)="logout()">
+        <i class="pi pi-sign-out"></i>
+        <span>Kijelentkezés</span>
+      </button>
+    </div>
+  </div>
+</nav>
