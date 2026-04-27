@@ -11,7 +11,7 @@ import { DividerModule } from 'primeng/divider';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '../../../services/auth.service';
 import { UserService } from '../../../services/user.service';
-import { StudentNavbarComponent } from '../../student/student-navbar/student-navbar.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-profile',
@@ -19,6 +19,7 @@ import { StudentNavbarComponent } from '../../student/student-navbar/student-nav
   imports: [
     CommonModule,
     FormsModule,
+    RouterModule,
     InputTextModule,
   PasswordModule,
     ButtonModule,
@@ -26,7 +27,6 @@ import { StudentNavbarComponent } from '../../student/student-navbar/student-nav
     TagModule,
     AvatarModule,
     DividerModule,
-    StudentNavbarComponent,
   ],
   providers: [MessageService],
   templateUrl: './profile.component.html',
@@ -60,6 +60,41 @@ export class ProfileComponent {
   email = '';
   username = '';
   role = '';
+
+  get roleLabel(): string {
+    if (this.role === 'teacher') return 'Tanár';
+    if (this.role === 'student') return 'Diák';
+    if (this.role === 'admin') return 'Admin';
+    if (this.role === 'pending') return 'Függőben';
+    if (this.role === 'parent') return 'Szülő';
+    return this.role || 'Felhasználó';
+  }
+
+  get contextTitle(): string {
+    if (this.role === 'teacher') return 'Tanári profil';
+    if (this.role === 'student') return 'Tanulói profil';
+    if (this.role === 'admin') return 'Admin profil';
+    return 'Profil';
+  }
+
+  get roleHomeRoute(): string {
+    if (this.role === 'teacher') return '/teacher/dashboard';
+    if (this.role === 'student') return '/student/dashboard';
+    if (this.role === 'admin') return '/admin/dashboard';
+    if (this.role === 'pending') return '/pending';
+    return '/';
+  }
+
+  get initials(): string {
+    const name = `${this.vezeteknev} ${this.keresztnev}`.trim() || this.username.trim() || 'U';
+    const parts = name.split(/\s+/).filter(Boolean);
+
+    if (parts.length >= 2) {
+      return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    }
+
+    return name.slice(0, 2).toUpperCase();
+  }
 
   jelenlegiJelszo = '';
   ujJelszo = '';

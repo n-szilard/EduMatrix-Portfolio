@@ -61,6 +61,24 @@ $muted: #94a3b8;
   gap: 24px;
 }
 
+.profile-context {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background-color: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+}
+
+.profile-context__left {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 // Profil fejléc
 .profile-header {
   display: flex;

@@ -1,45 +1,27 @@
 <p-toast position="bottom-center"></p-toast>
 
 <div class="profile-page">
-
-  @if (role === 'student') {
-    <app-student-navbar></app-student-navbar>
-  } @else {
-    <!-- NAVBAR -->
-    <nav class="navbar">
-      <div class="flex align-items-center gap-2">
-        <div class="logo-icon">
-          <i class="pi pi-graduation-cap"></i>
-        </div>
-        <span class="logo-text">Edu<span class="text-primary">Matrix</span></span>
-      </div>
-
-      <div class="flex align-items-center gap-3">
-        <p-button icon="pi pi-bell" [rounded]="true" [text]="true" severity="secondary" />
-        <p-divider layout="vertical" styleClass="mx-1" />
-        <div class="flex align-items-center gap-2">
-          <div class="user-info">
-            <span>{{ vezeteknev }} {{ keresztnev }}</span>
-            <small>{{ role }}</small>
-          </div>
-          <p-avatar label="TTS" shape="circle" styleClass="nav-avatar" />
-        </div>
-      </div>
-    </nav>
-  }
-
   <!-- FŐ TARTALOM -->
   <div class="content">
+
+    <div class="profile-context">
+      <div class="profile-context__left">
+        <p-tag [value]="contextTitle" severity="info" [rounded]="true" />
+        <p-tag [value]="roleLabel" severity="secondary" [rounded]="true" />
+      </div>
+
+      <a pButton type="button" [routerLink]="roleHomeRoute" label="Vissza a felületre" icon="pi pi-arrow-left" severity="secondary" [outlined]="true"></a>
+    </div>
 
     <!-- Profil fejléc -->
     <div class="profile-header">
       <div class="avatar-wrap">
-        <p-avatar label="TTS" shape="circle" styleClass="big-avatar" />
+        <p-avatar [label]="initials" shape="circle" styleClass="big-avatar" />
        
       </div>
       <div>
   <h1>{{ vezeteknev }} {{ keresztnev }}</h1>
-  <p>{{ role }} • EduMatrix Intézmény</p>
+  <p>{{ roleLabel }} • EduMatrix Intézmény</p>
         <div class="flex gap-2 mt-2">
           <p-tag value="AKTÍV FIÓK" severity="success" [rounded]="true" />
         </div>
@@ -140,15 +122,5 @@
     </div>
 
   </div>
-
-  <!-- LÁBLÉC -->
-  <footer>
-    <p>© 2024 EduMatrix Iskolai Adminisztrációs Rendszer v2.4.1</p>
-    <div class="footer-links">
-      <a href="#">Adatvédelmi tájékoztató</a>
-      <a href="#">Súgó központ</a>
-      <a href="#">Kapcsolat</a>
-    </div>
-  </footer>
 
 </div>
